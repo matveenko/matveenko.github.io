@@ -7,14 +7,14 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-color: #1a1a1a; /* Чуть темнее фон для глубины */
+            --bg-color: #1a1a1a;
             --card-bg: #2d2d2d;
             --text-main: #FFFFFF;
             --text-sec: #AAAAAA;
             --accent-sunray: #E3BC57;
             --accent-purple: #9D00FF;
             --danger-red: #cf0a0a;
-            --radius: 16px; /* Радиус побольше для премиум фила */
+            --radius: 16px;
             --sheet-bg: #1f1f1f;
         }
 
@@ -34,126 +34,122 @@
         .glide-entry { opacity: 0; animation: glideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
         @keyframes shimmer { 0% { transform: translateX(-100%) skewX(-15deg); } 100% { transform: translateX(200%) skewX(-15deg); } }
 
-        /* --- HEADER (Sticky) --- */
+        /* --- HEADER --- */
         .header-container {
             position: fixed; top: 0; left: 0; width: 100%;
-            background: rgba(26, 26, 26, 0.95); /* Полупрозрачный фон */
-            backdrop-filter: blur(10px); /* Эффект матового стекла */
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(10px);
             z-index: 100;
             padding: 15px 15px 10px 15px;
             border-bottom: 1px solid #333;
-            display: none; /* Скрыт на главной */
+            display: none;
         }
-
-        .header-top-row {
-            display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
-        }
-
-        .back-btn {
-            padding: 10px 15px; background: #333; border-radius: var(--radius);
-            color: var(--accent-sunray); font-weight: 600; font-size: 14px;
-            cursor: pointer; display: flex; align-items: center; transition: all 0.2s;
-        }
+        .header-top-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .back-btn { padding: 10px 15px; background: #333; border-radius: var(--radius); color: var(--accent-sunray); font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; transition: all 0.2s; }
         .back-btn:active { background: #444; transform: scale(0.97); }
-
-        .search-box {
-            flex: 1; background: #252525; border: 1px solid #3a3a3a;
-            border-radius: var(--radius); padding: 12px 15px; color: #fff;
-            font-size: 15px; transition: all 0.3s;
-        }
+        .search-box { flex: 1; background: #252525; border: 1px solid #3a3a3a; border-radius: var(--radius); padding: 12px 15px; color: #fff; font-size: 15px; transition: all 0.3s; }
         .search-box:focus { border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(157, 0, 255, 0.2); }
-
         .tags-wrapper { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
         .tags-wrapper::-webkit-scrollbar { display: none; }
         .tag { white-space: nowrap; padding: 8px 16px; background: #333; border-radius: 30px; font-size: 13px; font-weight: 600; color: #bbb; cursor: pointer; transition: all 0.3s; border: 1px solid transparent; }
         .tag.active { background: var(--accent-purple); color: #fff; box-shadow: 0 4px 15px rgba(157, 0, 255, 0.4); }
 
-        /* --- MAIN CONTENT CONTAINER --- */
-        .main-content {
-            padding: 20px 15px;
-            /* Отступ сверху будет меняться JS-ом в зависимости от экрана */
-            padding-top: 20px; 
-        }
+        /* --- MAIN CONTENT --- */
+        .main-content { padding: 20px 15px; padding-top: 20px; }
 
-        /* --- INQUISITION CARD (MANTICORE EDITION) --- */
-        .inquisition-card {
-            background: linear-gradient(135deg, #4a0000 0%, #1a0000 100%);
-            border: 1px solid #5a0000; border-left: 4px solid var(--danger-red);
-            border-radius: var(--radius); padding: 25px 20px;
-            cursor: pointer; position: relative; overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(207, 10, 10, 0.2);
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 30px; transition: transform 0.2s;
-        }
-        .inquisition-card::after { content: ''; position: absolute; top: 0; left: 0; width: 70%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 77, 77, 0.2), transparent); animation: shimmer 4s infinite cubic-bezier(0.4, 0.0, 0.2, 1); pointer-events: none; }
-        .inquisition-card:active { transform: scale(0.98); }
-        
-        .inq-text { z-index: 2; flex: 1; }
-        .inq-title { color: #ff6b6b; font-weight: 900; font-size: 20px; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1px; text-shadow: 0 2px 15px rgba(207, 10, 10, 0.7); }
-        .inq-desc { color: #ffcccc; font-size: 13px; opacity: 0.8; font-weight: 500; }
-        
-        /* Сюда вставлять картинку мантикоры */
-        .inq-icon-img {
-            width: 80px; height: 80px; object-fit: contain;
-            filter: drop-shadow(0 0 10px rgba(207, 10, 10, 0.5));
-            z-index: 2; margin-left: 15px;
-        }
-
-        /* --- HOME TILES GRID --- */
-        #homeTilesContainer {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* Две колонки */
-            gap: 15px;
-        }
-
-        .category-tile {
-            background: linear-gradient(145deg, #2a2a2a, #222222);
+        /* --- SPECIAL CARDS (Inquisition & Credo) --- */
+        .special-card {
+            margin-bottom: 20px; /* Отступ между карточками */
             border-radius: var(--radius);
             padding: 25px 20px;
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            border: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: transform 0.2s;
+            min-height: 100px;
+        }
+        .special-card::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 3s infinite cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        .special-card:active { transform: scale(0.97); }
+
+        /* INQUISITION STYLE (RED) */
+        .card-red {
+            background: linear-gradient(135deg, #420000 0%, #1a0000 100%);
+            border: 1px solid var(--danger-red);
+            border-left: 6px solid var(--danger-red);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(207, 10, 10, 0.2);
+        }
+        
+        /* CREDO STYLE (GOLD) */
+        .card-gold {
+            background: linear-gradient(135deg, #3a2e00 0%, #1a1a1a 100%);
+            border: 1px solid var(--accent-sunray);
+            border-left: 6px solid var(--accent-sunray);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(227, 188, 87, 0.15);
+        }
+        
+        /* Titles inside special cards */
+        .sp-title {
+            font-weight: 900; font-size: 19px;
+            text-transform: uppercase; letter-spacing: 1px;
+            margin-bottom: 6px; z-index: 2;
+        }
+        .red-text { color: #ff4d4d; text-shadow: 0 2px 10px rgba(207, 10, 10, 0.5); }
+        .gold-text { color: var(--accent-sunray); text-shadow: 0 2px 10px rgba(227, 188, 87, 0.4); }
+
+        .sp-desc { color: #ddd; font-size: 13px; line-height: 1.3; z-index: 2; opacity: 0.9; font-weight: 500; }
+        
+        /* Background Icons */
+        .sp-bg-icon {
+            position: absolute; right: -10px; bottom: -15px;
+            font-size: 80px; opacity: 0.1; transform: rotate(-20deg);
+            filter: grayscale(100%); z-index: 0; pointer-events: none;
+        }
+
+        /* --- HOME TILES GRID --- */
+        #homeTilesContainer { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); 
+            gap: 15px; 
+            margin-top: 10px;
+        }
+        
+        .category-tile {
+            background: linear-gradient(145deg, #2a2a2a, #222222);
+            border-radius: var(--radius); padding: 25px 20px; cursor: pointer;
+            position: relative; overflow: hidden; border: 1px solid #333;
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
             transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
             display: flex; flex-direction: column; justify-content: space-between;
             min-height: 140px;
         }
+        .category-tile:active { transform: scale(0.96); border-color: var(--accent-sunray); background: linear-gradient(145deg, rgba(227, 188, 87, 0.15), rgba(157, 0, 255, 0.15)); }
         
-        /* Эффект при наведении/нажатии - меняем градиент */
-        .category-tile:active {
-            transform: scale(0.96);
-            border-color: var(--accent-sunray);
-            /* Подсветка Sunray + Purple */
-            background: linear-gradient(145deg, rgba(227, 188, 87, 0.15), rgba(157, 0, 255, 0.15));
-        }
-
         .tile-icon { font-size: 32px; margin-bottom: 15px; }
-        .tile-title {
-            font-size: 16px; font-weight: 800; color: #fff;
-            text-transform: uppercase; letter-spacing: 0.5px;
+        .tile-title { 
+            font-size: 15px; font-weight: 800; color: #fff; 
+            text-transform: uppercase; letter-spacing: 0.5px; 
             line-height: 1.2;
+            word-break: break-word; hyphens: auto; 
         }
-        .tile-count {
-            font-size: 12px; color: #777; margin-top: 8px; font-weight: 500;
-        }
+        .tile-count { font-size: 12px; color: #777; margin-top: 8px; font-weight: 500; }
 
-        /* --- LIST VIEW STYLES --- */
-        #listViewContainer { display: none; /* Скрыт по умолчанию */ }
-
+        /* --- LIST VIEW --- */
+        #listViewContainer { display: none; }
         .section-header { margin-top: 30px; margin-bottom: 15px; display: flex; align-items: center; color: var(--accent-sunray); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1.2px; }
         .section-header::before { content: ''; display: inline-block; width: 4px; height: 18px; background: var(--accent-purple); margin-right: 12px; border-radius: 4px; box-shadow: 0 0 10px var(--accent-purple); }
-        
         .posts-list { display: flex; flex-direction: column; gap: 12px; perspective: 1000px; }
-        .post-card {
-            background-color: var(--card-bg); padding: 18px; border-radius: var(--radius);
-            cursor: pointer; position: relative; overflow: hidden; border: 1px solid #3a3a3a;
-            transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
+        .post-card { background-color: var(--card-bg); padding: 18px; border-radius: var(--radius); cursor: pointer; position: relative; overflow: hidden; border: 1px solid #3a3a3a; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .post-card:active { transform: scale(0.98); background-color: #333; border-color: var(--accent-sunray); }
         .post-title { font-size: 15px; line-height: 1.5; font-weight: 600; color: #e0e0e0; }
 
-        /* --- BOTTOM SHEET (Шторка) --- */
+        /* --- BOTTOM SHEET --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); z-index: 500; opacity: 0; visibility: hidden; transition: all 0.3s; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .bottom-sheet { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--sheet-bg); border-top-left-radius: 25px; border-top-right-radius: 25px; padding: 25px 20px 45px 20px; z-index: 600; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 -10px 50px rgba(0,0,0,0.7); max-height: 85vh; overflow-y: auto; border-top: 1px solid #333; }
@@ -169,7 +165,6 @@
         .related-item:active { background: #333; border-color: #555; }
         .related-arrow { color: var(--accent-purple); font-weight: bold; }
         .upsell-btn { background: linear-gradient(135deg, rgba(157, 0, 255, 0.15), rgba(157, 0, 255, 0.05)); border: 1px solid var(--accent-purple); color: #cba3ff; padding: 16px; border-radius: 16px; text-align: center; font-size: 15px; font-weight: 700; margin-top: 25px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(157, 0, 255, 0.1); }
-        
         .empty-state { text-align: center; color: #666; margin-top: 80px; font-size: 15px; font-weight: 500; }
     </style>
 </head>
@@ -185,17 +180,20 @@
 
     <div class="main-content">
         
-        <div class="inquisition-card glide-entry" id="inqBtn" style="animation-delay: 0.1s;">
-            <div class="inq-text">
-                <div class="inq-title">Дары Святой Инквизиции</div>
-                <div class="inq-desc">Закрытый канал. Доступ через бота.</div>
-            </div>
-            <img src="https://github.com/matveenko/matveenko.github.io/blob/main/image_2025-10-14_14-43-57.png" alt="Manticore" class="inq-icon-img">
+        <div class="special-card card-red glide-entry" id="inqBtn" style="animation-delay: 0.1s;">
+            <div class="sp-title red-text">🩸 Дары Святой Инквизиции</div>
+            <div class="sp-desc">Закрытый канал. Доступ только через бота. Жми, если готов.</div>
+            <div class="sp-bg-icon">⚖️</div>
         </div>
 
-        <div id="homeTilesContainer">
-            </div>
+        <div class="special-card card-gold glide-entry" id="credoBtn" style="animation-delay: 0.2s;">
+            <div class="sp-title gold-text">🏛 НАШЕ КРЕДО</div>
+            <div class="sp-desc">О нас и нашей деятельности.</div>
+            <div class="sp-bg-icon">🧭</div>
+        </div>
 
+        <div id="homeTilesContainer"></div>
+        
         <div id="listViewContainer">
              <div class="posts-list" id="postsContainer"></div>
         </div>
@@ -207,14 +205,11 @@
         <div class="sheet-handle"></div>
         <div class="sheet-category" id="sheetCategory">РУБРИКА</div>
         <div class="sheet-title" id="sheetTitle">Заголовок статьи</div>
-        
         <button class="btn-main" id="readBtn">ЧИТАТЬ СТАТЬЮ 🔥</button>
-        
         <div class="related-section">
             <div class="related-header">Ещё по этой теме:</div>
             <div id="relatedContainer"></div>
         </div>
-
         <button class="upsell-btn" id="upsellBtn">🎁 Забрать секретные материалы (Бот)</button>
     </div>
 
@@ -222,14 +217,10 @@
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
-        tg.setHeaderColor('#1a1a1a'); // Цвет хедера под фон
+        tg.setHeaderColor('#1a1a1a');
         tg.setBackgroundColor('#1a1a1a');
 
-        // === БАЗА ДАННЫХ ===
-        // t: Заголовок, u: Ссылка, c: Категория
-        // Я добавил иконки (i) для плиток. Можешь менять их на свои.
         const db = [
-            // ЖИЗНЕСТОЙКОСТЬ (Иконка ⚔️)
             { t: "Кто я такой? (История Андрэ)", u: "https://t.me/masonsmansion/61", c: "⚔️ Жизнестойкость" },
             { t: "Добро пожаловать в MENTAL MERIDIAN", u: "https://t.me/masonsmansion/12", c: "⚔️ Жизнестойкость" },
             { t: "Новичкам канала посвящается", u: "https://t.me/masonsmansion/34", c: "⚔️ Жизнестойкость" },
@@ -269,7 +260,6 @@
             { t: "Хватит дрочить на мотивацию", u: "https://t.me/masonsmansion/565", c: "⚔️ Жизнестойкость" },
             { t: "Тиндер сделал из тебя товар", u: "https://t.me/masonsmansion/567", c: "⚔️ Жизнестойкость" },
             { t: "Гражданская война в твоей спальне", u: "https://t.me/masonsmansion/580", c: "⚔️ Жизнестойкость" },
-            // ОШИБКИ МЫШЛЕНИЯ (Иконка 🧠)
             { t: "Фундаментальная ошибка атрибуции", u: "https://t.me/masonsmansion/84", c: "🧠 Ошибки мышления" },
             { t: "Стереотипизация", u: "https://t.me/masonsmansion/102", c: "🧠 Ошибки мышления" },
             { t: "Эффект моральной непогрешимости", u: "https://t.me/masonsmansion/110", c: "🧠 Ошибки мышления" },
@@ -289,7 +279,6 @@
             { t: "Эффект Барнума (гороскопы)", u: "https://t.me/masonsmansion/408", c: "🧠 Ошибки мышления" },
             { t: "Желание послать всё нахуй — не сила", u: "https://t.me/masonsmansion/409", c: "🧠 Ошибки мышления" },
             { t: "Желание всё упростить — признак слабоумия", u: "https://t.me/masonsmansion/416", c: "🧠 Ошибки мышления" },
-            // ЖЕНЩИНЫ (Иконка 💃)
             { t: "Как перебороть страх отказа", u: "https://t.me/masonsmansion/16", c: "💃 Женщины" },
             { t: "Первое впечатление при знакомстве", u: "https://t.me/masonsmansion/22", c: "💃 Женщины" },
             { t: "Деньги не решают, любовь не купишь", u: "https://t.me/masonsmansion/33", c: "💃 Женщины" },
@@ -316,7 +305,6 @@
             { t: "Меркантильные женщины: оправдание", u: "https://t.me/masonsmansion/559", c: "💃 Женщины" },
             { t: "Женская любовь: биохимия процесса", u: "https://t.me/masonsmansion/562", c: "💃 Женщины" },
             { t: "Самовлюбление в чучело", u: "https://t.me/masonsmansion/574", c: "💃 Женщины" },
-            // ЗДОРОВЬЕ (Иконка 💊)
             { t: "Партнеры Masons' Mansion (врачи)", u: "https://t.me/masonsmansion/58", c: "💊 Здоровье" },
             { t: "Ыыы я стану умным (таблетки)", u: "https://t.me/masonsmansion/333", c: "💊 Здоровье" },
             { t: "Гои дуреют с этой прикормки (БАДы)", u: "https://t.me/masonsmansion/341", c: "💊 Здоровье" },
@@ -326,7 +314,6 @@
             { t: "Ты спишь как лох (чудо-подушки)", u: "https://t.me/masonsmansion/561", c: "💊 Здоровье" },
             { t: "Зимняя апатия: гайд по борьбе с хандрой", u: "https://t.me/masonsmansion/568", c: "💊 Здоровье" },
             { t: "Боунсмешинг: смертельно опасный тренд", u: "https://t.me/masonsmansion/577", c: "💊 Здоровье" },
-            // МЕДИА (Иконка 🎙)
             { t: "Подкаст #1: Дорогой, я хочу тебя", u: "https://t.me/masonsmansion/286", c: "🎙 Медиа" },
             { t: "Подкаст #2: Как сдохнуть в 25 лет?", u: "https://t.me/masonsmansion/311", c: "🎙 Медиа" },
             { t: "Подкаст #3: Стиль — это всё", u: "https://t.me/masonsmansion/403", c: "🎙 Медиа" },
@@ -339,13 +326,11 @@
             { t: "Эфир про расставание (Видео)", u: "https://t.me/masonsmansion/519", c: "🎙 Медиа" },
             { t: "Подкаст о Темной Триаде", u: "https://t.me/masonsmansion/564", c: "🎙 Медиа" },
             { t: "Подкаст про женские проверки", u: "https://t.me/masonsmansion/434", c: "🎙 Медиа" },
-            // ФОЛЬКЛОР (Иконка 📜)
             { t: "Сказка о Степашке. Часть 1", u: "https://t.me/masonsmansion/174", c: "📜 Фольклор" },
             { t: "Сказка о Степашке. Часть 2", u: "https://t.me/masonsmansion/194", c: "📜 Фольклор" },
             { t: "Сказка о Степашке. Часть 3", u: "https://t.me/masonsmansion/203", c: "📜 Фольклор" },
             { t: "Сказка о Степашке. Финал", u: "https://t.me/masonsmansion/210", c: "📜 Фольклор" },
             { t: "Книга «Уроборос» (Киберпанк)", u: "https://t.me/masonsmansion/505", c: "📜 Фольклор" },
-            // ИНКВИЗИЦИЯ (Иконка 🔒)
             { t: "Гайд на сайты знакомств (Файл)", u: "https://t.me/masonsmansion/309", c: "🔒 Гайды/Отчеты" },
             { t: "Отчет Инквизиции #1 (Весна 2025)", u: "https://t.me/masonsmansion/392", c: "🔒 Гайды/Отчеты" },
             { t: "Отчет Инквизиции #2 (Март-Апрель 2025)", u: "https://t.me/masonsmansion/428", c: "🔒 Гайды/Отчеты" },
@@ -354,7 +339,6 @@
             { t: "Зачем мы предлагаем тебе Инквизицию?", u: "https://t.me/masonsmansion/521", c: "🔒 Гайды/Отчеты" },
         ];
 
-        // Собираем уникальные категории и их иконки
         const categoriesMap = new Map();
         db.forEach(item => {
             const parts = item.c.split(' ');
@@ -365,15 +349,12 @@
             }
             categoriesMap.get(item.c).count++;
         });
-
         const uniqueCategoriesList = Array.from(categoriesMap.values());
         
-        // Состояние приложения
-        let currentViewState = 'home'; // 'home' or 'list'
+        let currentViewState = 'home';
         let currentCategory = null;
         let searchQuery = "";
 
-        // Элементы DOM
         const listHeader = document.getElementById('listHeader');
         const backToHomeBtn = document.getElementById('backToHomeBtn');
         const homeTilesContainer = document.getElementById('homeTilesContainer');
@@ -382,19 +363,18 @@
         const searchInput = document.getElementById('searchInput');
         const tagsContainer = document.getElementById('tagsContainer');
         const mainContent = document.querySelector('.main-content');
-
-        // --- ФУНКЦИИ ПЕРЕКЛЮЧЕНИЯ ВИДА ---
+        const credoBtn = document.getElementById('credoBtn');
 
         function switchToHome() {
             currentViewState = 'home';
             currentCategory = null;
             searchQuery = "";
             searchInput.value = "";
-            
             listHeader.style.display = 'none';
             listViewContainer.style.display = 'none';
             homeTilesContainer.style.display = 'grid';
-            mainContent.style.paddingTop = '20px'; // Возвращаем отступ
+            mainContent.style.paddingTop = '20px';
+            credoBtn.style.display = 'flex'; // Показываем кнопку Кредо
             window.scrollTo({ top: 0 });
             tg.HapticFeedback.impactOccurred('light');
         }
@@ -402,13 +382,11 @@
         function switchToList(category) {
             currentViewState = 'list';
             currentCategory = category;
-            
             homeTilesContainer.style.display = 'none';
+            credoBtn.style.display = 'none'; // Скрываем кнопку Кредо в списке
             listHeader.style.display = 'block';
             listViewContainer.style.display = 'block';
-            // Компенсируем высоту хедера
             mainContent.style.paddingTop = (listHeader.offsetHeight + 20) + 'px';
-            
             renderTags();
             filterAndRenderList(true);
             window.scrollTo({ top: 0 });
@@ -416,10 +394,9 @@
 
         backToHomeBtn.addEventListener('click', switchToHome);
 
-        // --- РЕНДЕР ПЛИТОК НА ГЛАВНОЙ ---
         function renderHomeTiles() {
             homeTilesContainer.innerHTML = '';
-            let animDelay = 0.2;
+            let animDelay = 0.3; // Чуть позже, так как сверху карточки
             uniqueCategoriesList.forEach(catData => {
                 const tile = document.createElement('div');
                 tile.className = 'category-tile glide-entry';
@@ -440,10 +417,8 @@
             });
         }
 
-        // --- РЕНДЕР СПИСКА (СТАРАЯ ЛОГИКА) ---
         function renderTags() {
             tagsContainer.innerHTML = '';
-            // Кнопка "Все" в режиме списка возвращает на главную
             const homeTag = document.createElement('div');
             homeTag.className = 'tag';
             homeTag.innerText = '← На Главную';
@@ -468,20 +443,31 @@
         function filterAndRenderList(animate = true) {
             postsContainer.innerHTML = '';
             let animationIndex = 0;
-            
-            let filtered = db.filter(item => {
-                // Фильтр по категории И по поиску
-                const catMatch = item.c === currentCategory;
-                const searchMatch = item.t.toLowerCase().includes(searchQuery.toLowerCase());
-                return catMatch && searchMatch;
-            });
+            let filtered = [];
+
+            // Если категория спец. (CREDO), фильтруем по конкретным ссылкам
+            if (currentCategory === "🏛 ФУНДАМЕНТ & КРЕДО") {
+                const credoUrls = [
+                    "https://t.me/masonsmansion/61",
+                    "https://t.me/masonsmansion/12",
+                    "https://t.me/masonsmansion/34",
+                    "https://t.me/masonsmansion/286"
+                ];
+                filtered = db.filter(item => credoUrls.includes(item.u));
+            } else {
+                // Обычная фильтрация
+                filtered = db.filter(item => {
+                    const catMatch = item.c === currentCategory;
+                    const searchMatch = item.t.toLowerCase().includes(searchQuery.toLowerCase());
+                    return catMatch && searchMatch;
+                });
+            }
 
             if (filtered.length === 0) {
-                postsContainer.innerHTML = '<div class="empty-state glide-entry" style="animation-delay: 0.1s">В этой рубрике по твоему запросу ничего нет.</div>';
+                postsContainer.innerHTML = '<div class="empty-state glide-entry" style="animation-delay: 0.1s">Пусто.</div>';
                 return;
             }
 
-            // Заголовок рубрики
             const header = document.createElement('div');
             header.className = animate ? 'section-header glide-entry' : 'section-header';
             if(animate) header.style.animationDelay = '0.1s';
@@ -489,12 +475,10 @@
             postsContainer.appendChild(header);
             animationIndex++;
 
-            // Список постов
             filtered.forEach(item => {
                 const div = document.createElement('div');
                 div.className = animate ? 'post-card glide-entry' : 'post-card';
                 if (animate) { div.style.animationDelay = `${0.1 + (animationIndex * 0.05)}s`; }
-                
                 div.innerHTML = `<div class="post-title">${item.t}</div>`;
                 div.onclick = () => { openSheet(item); };
                 postsContainer.appendChild(div);
@@ -507,7 +491,6 @@
             filterAndRenderList(true);
         });
 
-        // --- ШТОРКА (BOTTOM SHEET) ---
         const modalOverlay = document.getElementById('modalOverlay');
         const postSheet = document.getElementById('postSheet');
         const sheetTitle = document.getElementById('sheetTitle');
@@ -519,10 +502,8 @@
         function openSheet(item) {
             tg.HapticFeedback.impactOccurred('medium');
             sheetTitle.innerText = item.t;
-            // Добавляем иконку к категории в шторке
             const catIcon = item.c.split(' ')[0];
             sheetCategory.innerHTML = `<span style="font-size: 18px;">${catIcon}</span> ${item.c.substring(catIcon.length)}`;
-            
             readBtn.onclick = () => {
                 tg.HapticFeedback.impactOccurred('light');
                 tg.openTelegramLink(item.u);
@@ -531,7 +512,7 @@
                 tg.HapticFeedback.impactOccurred('light');
                 tg.openTelegramLink('https://t.me/GiftsHolyInquisition_bot');
             }
-
+            // Похожие: берем из той же категории, если это не Кредо (у Кредо категория в базе другая)
             const related = db.filter(p => p.c === item.c && p.u !== item.u).sort(() => 0.5 - Math.random()).slice(0, 3);
             relatedContainer.innerHTML = '';
             if (related.length === 0) relatedContainer.innerHTML = '<div style="color:#666; font-size:13px;">Нет похожих материалов</div>';
@@ -550,15 +531,37 @@
         function closeSheet() { modalOverlay.classList.remove('active'); postSheet.classList.remove('active'); }
         modalOverlay.addEventListener('click', closeSheet);
 
-        // --- ИНКВИЗИЦИЯ ---
+        // КЛИК ПО ИНКВИЗИЦИИ
         document.getElementById('inqBtn').addEventListener('click', () => {
             tg.HapticFeedback.impactOccurred('heavy');
             tg.openTelegramLink('https://t.me/GiftsHolyInquisition_bot');
         });
 
-        // --- ИНИЦИАЛИЗАЦИЯ ---
-        renderHomeTiles();
+        // КЛИК ПО КРЕДО
+        credoBtn.addEventListener('click', () => {
+            tg.HapticFeedback.impactOccurred('medium');
+            // Переключаем на вид списка, но с особой "категорией"
+            currentViewState = 'list';
+            currentCategory = "🏛 ФУНДАМЕНТ & КРЕДО";
+            homeTilesContainer.style.display = 'none';
+            credoBtn.style.display = 'none';
+            listHeader.style.display = 'block';
+            listViewContainer.style.display = 'block';
+            mainContent.style.paddingTop = (listHeader.offsetHeight + 20) + 'px';
+            
+            // В тегах оставляем только кнопку "Назад"
+            tagsContainer.innerHTML = '';
+            const homeTag = document.createElement('div');
+            homeTag.className = 'tag';
+            homeTag.innerText = '← На Главную';
+            homeTag.onclick = switchToHome;
+            tagsContainer.appendChild(homeTag);
 
+            filterAndRenderList(true);
+            window.scrollTo({ top: 0 });
+        });
+
+        renderHomeTiles();
     </script>
 </body>
 </html>
