@@ -7,14 +7,14 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            /* --- MENTAL MERIDIAN PALETTE --- */
+            /* --- PALETTE --- */
             --bg-body: #1a1a1a;
             --bg-card: #2d2d2d;
             --text-main: #FFFFFF;
             --text-sec: #AAAAAA;
-            --accent-sunray: #E3BC57; /* Золото */
-            --accent-purple: #9D00FF; /* Техно-фиолетовый */
-            --danger-red: #cf0a0a;    /* Кровь */
+            --accent-sunray: #E3BC57;
+            --accent-purple: #9D00FF;
+            --danger-red: #cf0a0a;
             --danger-dark: #900000;
             --highlight-bg: rgba(157, 0, 255, 0.4); 
             
@@ -39,7 +39,7 @@
         .glide-entry { opacity: 0; animation: glideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
         @keyframes shimmer { 0% { transform: translateX(-100%) skewX(-15deg); } 100% { transform: translateX(200%) skewX(-15deg); } }
 
-        /* --- HEADER (GLOBAL) --- */
+        /* --- HEADER --- */
         .header-container {
             position: fixed; top: 0; left: 0; width: 100%;
             background: rgba(26, 26, 26, 0.98);
@@ -47,17 +47,14 @@
             padding: 15px 15px 10px 15px;
             border-bottom: 1px solid #333;
             transition: all 0.3s ease;
-            /* Важно: backdrop-filter может лагать на старых ios при скролле, лучше плотный фон */
         }
-        
         .header-top-row { display: flex; align-items: center; gap: 10px; }
         
         .back-btn { 
             padding: 0 16px; height: 42px; background: #333; 
             border-radius: 12px; color: var(--accent-sunray); 
             font-weight: 600; font-size: 14px; cursor: pointer; 
-            display: none; /* Скрыта на главной */
-            align-items: center; justify-content: center;
+            display: none; align-items: center; justify-content: center;
             border: 1px solid #444; transition: all 0.2s;
         }
         .back-btn:active { background: #444; transform: scale(0.95); }
@@ -65,35 +62,19 @@
         .search-box { 
             flex: 1; height: 42px; background: #252525; 
             border: 1px solid #3a3a3a; border-radius: 12px; 
-            padding: 0 15px; color: #fff; font-size: 15px; 
-            transition: all 0.3s;
+            padding: 0 15px; color: #fff; font-size: 15px; transition: all 0.3s;
         }
         .search-box:focus { border-color: var(--accent-purple); box-shadow: 0 0 10px rgba(157, 0, 255, 0.2); }
         
-        .tags-wrapper { 
-            display: none; /* Скрыты на главной */
-            gap: 8px; overflow-x: auto; 
-            padding-top: 12px; padding-bottom: 5px; 
-            scrollbar-width: none; 
-        }
+        .tags-wrapper { display: none; gap: 8px; overflow-x: auto; padding-top: 12px; padding-bottom: 5px; scrollbar-width: none; }
         .tags-wrapper::-webkit-scrollbar { display: none; }
-        
-        .tag { 
-            white-space: nowrap; padding: 8px 16px; background: #333; 
-            border-radius: 30px; font-size: 13px; font-weight: 600; 
-            color: #bbb; cursor: pointer; border: 1px solid transparent; 
-            transition: all 0.3s; 
-        }
+        .tag { white-space: nowrap; padding: 8px 16px; background: #333; border-radius: 30px; font-size: 13px; font-weight: 600; color: #bbb; cursor: pointer; border: 1px solid transparent; transition: all 0.3s; }
         .tag.active { background: var(--accent-purple); color: #fff; box-shadow: 0 4px 15px rgba(157, 0, 255, 0.4); }
 
-        /* --- MAIN CONTENT --- */
-        /* Отступ будет задаваться через JS, но дефолт оставим */
-        .main-content { 
-            padding: 80px 15px 20px 15px; 
-            transition: padding-top 0.3s ease; /* Плавное изменение отступа */
-        }
+        /* --- CONTENT --- */
+        .main-content { padding: 80px 15px 80px 15px; transition: padding-top 0.3s ease; }
 
-        /* --- SPECIAL CARDS --- */
+        /* --- CARDS --- */
         .special-card {
             margin-bottom: 20px; border-radius: var(--radius); padding: 25px 20px;
             cursor: pointer; position: relative; overflow: hidden;
@@ -101,33 +82,24 @@
             transition: transform 0.1s; min-height: 100px;
             box-shadow: var(--shadow);
         }
-        .special-card::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            animation: shimmer 3s infinite cubic-bezier(0.4, 0.0, 0.2, 1);
-        }
+        .special-card::after { content: ''; position: absolute; top: 0; left: 0; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent); animation: shimmer 3s infinite cubic-bezier(0.4, 0.0, 0.2, 1); }
         .special-card:active { transform: scale(0.98); }
 
-        .card-red {
-            background: linear-gradient(135deg, #420000 0%, #1a0000 100%);
-            border: 1px solid var(--danger-red); border-left: 6px solid var(--danger-red);
-        }
-        .card-gold {
-            background: linear-gradient(135deg, #3a2e00 0%, #1a1a1a 100%);
-            border: 1px solid var(--accent-sunray); border-left: 6px solid var(--accent-sunray);
-        }
-        
+        .card-red { background: linear-gradient(135deg, #420000 0%, #1a0000 100%); border: 1px solid var(--danger-red); border-left: 6px solid var(--danger-red); }
+        .card-gold { background: linear-gradient(135deg, #3a2e00 0%, #1a1a1a 100%); border: 1px solid var(--accent-sunray); border-left: 6px solid var(--accent-sunray); }
+        .card-purple { background: linear-gradient(135deg, #2a003a 0%, #1a1a1a 100%); border: 1px solid var(--accent-purple); border-left: 6px solid var(--accent-purple); display: none; /* Скрыта, пока нет избранного */ }
+
         .sp-title { font-weight: 900; font-size: 19px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; z-index: 2; }
         .red-text { color: #ff4d4d; text-shadow: 0 2px 10px rgba(207, 10, 10, 0.5); }
         .gold-text { color: var(--accent-sunray); text-shadow: 0 2px 10px rgba(227, 188, 87, 0.4); }
+        .purple-text { color: var(--accent-purple); text-shadow: 0 2px 10px rgba(157, 0, 255, 0.4); }
+        
         .sp-desc { color: #ddd; font-size: 13px; line-height: 1.3; z-index: 2; opacity: 0.9; font-weight: 500; }
         .sp-bg-icon { position: absolute; right: -10px; bottom: -15px; font-size: 80px; opacity: 0.1; transform: rotate(-20deg); filter: grayscale(100%); z-index: 0; pointer-events: none; }
 
-        /* --- WRAPPER FOR HOME ELEMENTS --- */
         #homeWrapper { display: flex; flex-direction: column; }
-
-        /* --- HOME TILES --- */
         #homeTilesContainer { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 15px; margin-top: 10px; }
+        
         .category-tile {
             background: linear-gradient(145deg, #2a2a2a, #222222);
             border-radius: var(--radius); padding: 25px 20px; cursor: pointer;
@@ -141,69 +113,43 @@
         .tile-title { font-size: 15px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2; word-break: break-word; hyphens: auto; }
         .tile-count { font-size: 12px; color: #777; margin-top: 8px; font-weight: 500; }
 
-        /* --- LIST VIEW --- */
+        /* --- LIST & POSTS --- */
         #listViewContainer { display: none; }
-        
-        .section-header { 
-            /* Добавил отступ сверху побольше */
-            margin-top: 25px; 
-            margin-bottom: 15px; 
-            display: flex; align-items: center; 
-            color: var(--accent-sunray); 
-            font-weight: 800; font-size: 14px; 
-            text-transform: uppercase; letter-spacing: 1.2px; 
-        }
+        .section-header { margin-top: 25px; margin-bottom: 15px; display: flex; align-items: center; color: var(--accent-sunray); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1.2px; }
         .section-header::before { content: ''; display: inline-block; width: 4px; height: 18px; background: var(--accent-purple); margin-right: 12px; border-radius: 4px; box-shadow: 0 0 10px var(--accent-purple); }
         .posts-list { display: flex; flex-direction: column; gap: 12px; }
+        
         .post-card { background-color: var(--card-bg); padding: 18px; border-radius: var(--radius); cursor: pointer; position: relative; overflow: hidden; border: 1px solid #3a3a3a; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .post-card:active { background-color: #383838; border-color: var(--accent-sunray); }
-        .post-title { font-size: 15px; line-height: 1.5; font-weight: 600; color: #e0e0e0; }
-        .highlight { background: var(--highlight-bg); color: #fff; padding: 0 2px; border-radius: 4px; box-shadow: 0 0 5px var(--accent-purple); }
+        .post-title { font-size: 15px; line-height: 1.5; font-weight: 600; color: #e0e0e0; display: flex; justify-content: space-between; align-items: flex-start; }
+        
+        /* Стили для прочитанного и закрытого */
+        .is-read { opacity: 0.5; }
+        .read-icon { color: var(--accent-purple); font-weight: bold; margin-left: 10px; font-size: 14px; }
+        
+        .post-locked { border-left: 3px solid var(--danger-red); background: rgba(207, 10, 10, 0.05); }
+        .lock-icon { color: var(--danger-red); margin-left: 10px; }
+
+        .highlight { background: var(--highlight-bg); color: #fff; padding: 0 2px; border-radius: 4px; }
 
         /* --- BOTTOM SHEET --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); z-index: 500; opacity: 0; visibility: hidden; transition: opacity 0.2s; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
-        
-        .bottom-sheet { 
-            position: fixed; bottom: 0; left: 0; width: 100%; 
-            background-color: var(--sheet-bg); 
-            border-top-left-radius: 25px; border-top-right-radius: 25px; 
-            padding: 25px 20px 45px 20px; 
-            z-index: 600; 
-            transform: translateY(100%); 
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); 
-            box-shadow: 0 -10px 50px rgba(0,0,0,0.7); 
-            max-height: 85vh; overflow-y: auto; 
-            border-top: 1px solid #333; 
-        }
+        .bottom-sheet { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--sheet-bg); border-top-left-radius: 25px; border-top-right-radius: 25px; padding: 25px 20px 45px 20px; z-index: 600; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 -10px 50px rgba(0,0,0,0.7); max-height: 85vh; overflow-y: auto; border-top: 1px solid #333; }
         .bottom-sheet.active { transform: translateY(0); }
         
         .sheet-handle { width: 50px; height: 6px; background: #444; border-radius: 10px; margin: 0 auto 25px auto; }
         .sheet-category { color: var(--accent-purple); font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
         .sheet-title { font-size: 24px; font-weight: 800; line-height: 1.3; margin-bottom: 30px; color: #fff; }
-        
         .sheet-actions { display: flex; gap: 10px; margin-bottom: 30px; }
         
-        .btn-main { 
-            flex: 2; text-align: center; 
-            background: var(--accent-sunray); color: #000; 
-            font-weight: 900; font-size: 16px; text-transform: uppercase; 
-            padding: 16px; border-radius: 14px; border: none; cursor: pointer; 
-            box-shadow: 0 5px 20px rgba(227, 188, 87, 0.3); 
-            transition: transform 0.1s; 
-        }
+        /* КНОПКИ В ШТОРКЕ */
+        .btn-main { flex: 3; text-align: center; background: var(--accent-sunray); color: #000; font-weight: 900; font-size: 16px; text-transform: uppercase; padding: 16px; border-radius: 14px; border: none; cursor: pointer; box-shadow: 0 5px 20px rgba(227, 188, 87, 0.3); transition: transform 0.1s; }
         .btn-main:active { transform: scale(0.97); }
         
-        .btn-share {
-            flex: 1; display: flex; align-items: center; justify-content: center;
-            background: rgba(157, 0, 255, 0.15); 
-            color: var(--accent-purple);
-            border: 1px solid var(--accent-purple);
-            border-radius: 14px; font-weight: 700; font-size: 20px;
-            cursor: pointer; transition: background 0.1s;
-            backdrop-filter: blur(5px);
-        }
-        .btn-share:active { background: rgba(157, 0, 255, 0.3); }
+        .btn-icon { flex: 1; display: flex; align-items: center; justify-content: center; background: rgba(157, 0, 255, 0.15); color: var(--accent-purple); border: 1px solid var(--accent-purple); border-radius: 14px; font-weight: 700; font-size: 20px; cursor: pointer; transition: background 0.1s; backdrop-filter: blur(5px); }
+        .btn-icon:active { background: rgba(157, 0, 255, 0.3); }
+        .btn-icon.active { background: var(--accent-purple); color: #fff; box-shadow: 0 0 15px var(--accent-purple); }
 
         .related-section { border-top: 1px solid #333; padding-top: 25px; }
         .related-header { font-size: 14px; color: #888; margin-bottom: 18px; font-weight: 700; text-transform: uppercase; }
@@ -211,41 +157,29 @@
         .related-item:active { background: #333; border-color: #555; }
         .related-arrow { color: var(--accent-purple); font-weight: bold; }
         
-        .upsell-btn { 
-            background: #252525;
-            border: 1px solid #444; color: var(--text-sec); 
-            padding: 16px; border-radius: 14px; text-align: center; 
-            font-size: 14px; font-weight: 600; margin-top: 25px; 
-            width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; 
-            transition: all 0.2s;
-        }
-        .upsell-btn:active { 
-            border-color: var(--accent-purple); color: var(--accent-purple); 
-            background: rgba(157, 0, 255, 0.05);
-        }
+        .upsell-btn { background: #252525; border: 1px solid #444; color: var(--text-sec); padding: 16px; border-radius: 14px; text-align: center; font-size: 14px; font-weight: 600; margin-top: 25px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.2s; }
+        .upsell-btn:active { border-color: var(--accent-purple); color: var(--accent-purple); background: rgba(157, 0, 255, 0.05); }
         
         .empty-state { text-align: center; color: #666; margin-top: 60px; font-size: 15px; font-weight: 500; }
         
-        .btn-inq-action {
-            margin-top: 20px;
-            font-size: 14px;
-            padding: 14px 24px;
-            width: auto;
-            display: inline-block;
-            background: linear-gradient(135deg, var(--danger-red), var(--danger-dark));
-            color: #FFFFFF !important;
-            font-weight: 800;
-            text-transform: uppercase;
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 5px 20px rgba(207, 10, 10, 0.4);
-            transition: transform 0.1s;
-            letter-spacing: 0.5px;
+        .btn-inq-action { margin-top: 20px; font-size: 14px; padding: 14px 24px; width: auto; display: inline-block; background: linear-gradient(135deg, var(--danger-red), var(--danger-dark)); color: #FFFFFF !important; font-weight: 800; text-transform: uppercase; border-radius: 12px; border: none; box-shadow: 0 5px 20px rgba(207, 10, 10, 0.4); transition: transform 0.1s; letter-spacing: 0.5px; }
+        .btn-inq-action:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(207, 10, 10, 0.3); }
+
+        /* --- RANDOM FAB (DICE) --- */
+        .fab-dice {
+            position: fixed; bottom: 30px; right: 20px;
+            width: 56px; height: 56px;
+            background: var(--accent-purple);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 5px 20px rgba(157, 0, 255, 0.5);
+            z-index: 90;
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 2px solid rgba(255,255,255,0.2);
         }
-        .btn-inq-action:active {
-            transform: scale(0.97);
-            box-shadow: 0 2px 10px rgba(207, 10, 10, 0.3);
-        }
+        .fab-dice:active { transform: scale(0.9) rotate(20deg); }
     </style>
 </head>
 <body>
@@ -273,6 +207,12 @@
                 <div class="sp-bg-icon">🧭</div>
             </div>
 
+            <div class="special-card card-purple glide-entry" id="favBtn" style="animation-delay: 0.15s; display: none;">
+                <div class="sp-title purple-text">⭐️ ИЗБРАННОЕ</div>
+                <div class="sp-desc">Твоя личная подборка. <span id="favCount">0</span> материалов.</div>
+                <div class="sp-bg-icon">🔖</div>
+            </div>
+
             <div id="homeTilesContainer"></div>
         </div>
 
@@ -282,16 +222,21 @@
 
     </div>
 
+    <div class="fab-dice" id="randomBtn">🎲</div>
+
     <div class="modal-overlay" id="modalOverlay"></div>
     <div class="bottom-sheet" id="postSheet">
         <div class="sheet-handle"></div>
         <div class="sheet-category" id="sheetCategory">РУБРИКА</div>
         <div class="sheet-title" id="sheetTitle">Заголовок статьи</div>
         
-        <div class="sheet-actions">
+        <div class="sheet-actions" id="sheetActions">
             <button class="btn-main" id="readBtn">ЧИТАТЬ СТАТЬЮ 🔥</button>
-            <button class="btn-share" id="shareBtn">📤</button>
+            <button class="btn-icon" id="favSheetBtn">⭐️</button>
+            <button class="btn-icon" id="shareBtn">📤</button>
         </div>
+        
+        <button class="btn-inq-action" id="lockedBtn" style="display:none; width:100%; margin-top:0;">ДОСТУПНО В ИНКВИЗИЦИИ 🔒</button>
 
         <div class="related-section">
             <div class="related-header">Ещё по этой теме:</div>
@@ -299,7 +244,6 @@
         </div>
         <button class="upsell-btn" id="upsellBtn">🎁 Забрать секретные материалы (Бот)</button>
     </div>
-
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready();
@@ -307,7 +251,9 @@
         tg.setHeaderColor('#262626');
         tg.setBackgroundColor('#1a1a1a');
 
-        const STATE_KEY = 'mm_hub_state_v5.1'; 
+        const STATE_KEY = 'mm_hub_state_v6'; 
+        const READ_KEY = 'mm_read_posts';
+        const FAV_KEY = 'mm_favorites';
         const STATE_TTL = 15 * 60 * 1000; 
 
         // БАЗА ДАННЫХ
@@ -428,10 +374,16 @@
             { t: "Отчет Инквизиции #3 (Май-Июнь 2025)", u: "https://t.me/masonsmansion/507", c: "🔒 Гайды/Отчеты" },
             { t: "Куда пойти на свиданку (Гайд)", u: "https://t.me/masonsmansion/430", c: "🔒 Гайды/Отчеты" },
             { t: "Зачем мы предлагаем тебе Инквизицию?", u: "https://t.me/masonsmansion/521", c: "🔒 Гайды/Отчеты" },
+            
+            // --- ПРИМЕРЫ ЗАКРЫТЫХ СТАТЕЙ (FOMO) ---
+            { t: "Самое подробное обьяснение тестостерона", u: "locked_1", c: "💊 Здоровье", locked: true },
+            { t: "Как пройти любую женскую проверку?", u: "locked_2", c: "💃 Женщины", locked: true },
+            { t: "Что с тобой сделала твоя инфантильность?", u: "locked_3", c: "⚔️ Жизнестойкость", locked: true }
         ];
 
         const categoriesMap = new Map();
         db.forEach(item => {
+            if(item.locked) return; // Не считаем закрытые статьи в счетчике категорий
             const parts = item.c.split(' ');
             const icon = parts[0];
             const name = parts.slice(1).join(' ');
@@ -446,6 +398,7 @@
         let currentCategory = null;
         let searchQuery = "";
 
+        // DOM Elements
         const listHeader = document.getElementById('listHeader');
         const backToHomeBtn = document.getElementById('backToHomeBtn');
         const homeTilesContainer = document.getElementById('homeTilesContainer');
@@ -455,27 +408,53 @@
         const tagsContainer = document.getElementById('tagsContainer');
         const mainContent = document.getElementById('mainContent');
         const homeWrapper = document.getElementById('homeWrapper');
+        const favBtn = document.getElementById('favBtn');
+        const favCount = document.getElementById('favCount');
+        const randomBtn = document.getElementById('randomBtn');
         
+        // Sheet Elements
         const modalOverlay = document.getElementById('modalOverlay');
         const postSheet = document.getElementById('postSheet');
         const sheetTitle = document.getElementById('sheetTitle');
         const sheetCategory = document.getElementById('sheetCategory');
+        const sheetActions = document.getElementById('sheetActions');
         const readBtn = document.getElementById('readBtn');
+        const favSheetBtn = document.getElementById('favSheetBtn');
         const shareBtn = document.getElementById('shareBtn');
+        const lockedBtn = document.getElementById('lockedBtn');
         const relatedContainer = document.getElementById('relatedContainer');
         const upsellBtn = document.getElementById('upsellBtn');
 
-        // --- ФУНКЦИЯ КОРРЕКТИРОВКИ ОТСТУПА ---
+        // --- DATA HELPERS ---
+        function getRead() { return JSON.parse(localStorage.getItem(READ_KEY) || '[]'); }
+        function setRead(url) { 
+            const list = getRead();
+            if(!list.includes(url)) { list.push(url); localStorage.setItem(READ_KEY, JSON.stringify(list)); }
+        }
+        function getFav() { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); }
+        function toggleFav(url) {
+            let list = getFav();
+            if(list.includes(url)) list = list.filter(u => u !== url);
+            else list.push(url);
+            localStorage.setItem(FAV_KEY, JSON.stringify(list));
+            updateFavCard(); // Обновить плитку на главной
+            return list.includes(url);
+        }
+
+        function updateFavCard() {
+            const list = getFav();
+            favCount.innerText = list.length;
+            favBtn.style.display = list.length > 0 ? 'flex' : 'none';
+        }
+
         function adjustPadding() {
-            // Даем браузеру отрисовать изменения (теги, кнопки), затем мерим высоту
             requestAnimationFrame(() => {
                 const headerHeight = listHeader.offsetHeight;
-                // Добавляем 20px воздуха
                 mainContent.style.paddingTop = (headerHeight + 20) + 'px';
             });
         }
 
-        // --- СОХРАНЕНИЕ СОСТОЯНИЯ ---
+        // --- STATE MANAGEMENT ---
         function saveState() {
             try {
                 const state = {
@@ -486,7 +465,7 @@
                     ts: Date.now()
                 };
                 localStorage.setItem(STATE_KEY, JSON.stringify(state));
-            } catch (e) { console.log(e); }
+            } catch (e) {}
         }
 
         function restoreState() {
@@ -494,27 +473,21 @@
                 const raw = localStorage.getItem(STATE_KEY);
                 if (!raw) return;
                 const state = JSON.parse(raw);
-                if (Date.now() - state.ts > STATE_TTL) {
-                    localStorage.removeItem(STATE_KEY);
-                    return;
-                }
+                if (Date.now() - state.ts > STATE_TTL) { localStorage.removeItem(STATE_KEY); return; }
 
                 if (state.view === 'list') {
-                    if (state.category === "🏛 ФУНДАМЕНТ & КРЕДО") {
-                        showCredo(false);
-                    } else {
-                        switchToList(state.category, false);
-                    }
+                    if (state.category === "🏛 ФУНДАМЕНТ & КРЕДО") showCredo(false);
+                    else if (state.category === "⭐️ ИЗБРАННОЕ") showFavorites(false);
+                    else switchToList(state.category, false);
                     
                     if (state.search) {
                         searchQuery = state.search;
                         searchInput.value = state.search;
                         filterAndRenderList(false);
                     }
-
                     setTimeout(() => { window.scrollTo(0, state.scroll); }, 10);
                 }
-            } catch (e) { console.log(e); }
+            } catch (e) {}
         }
 
         function switchToHome() {
@@ -522,58 +495,58 @@
             currentCategory = null;
             searchQuery = "";
             searchInput.value = "";
-            
             backToHomeBtn.style.display = 'none';
             tagsContainer.style.display = 'none';
             listViewContainer.style.display = 'none';
-            
             homeWrapper.style.display = 'block';
-            
-            adjustPadding(); // Пересчет отступа!
-            
+            randomBtn.style.display = 'flex'; // Показываем рандом
+            adjustPadding();
             window.scrollTo({ top: 0 });
             tg.HapticFeedback.impactOccurred('light');
             localStorage.removeItem(STATE_KEY);
+            updateFavCard();
         }
 
         function switchToList(category, animate = true) {
             currentViewState = 'list';
             currentCategory = category;
-            
             backToHomeBtn.style.display = 'flex';
             tagsContainer.style.display = 'flex';
-            
             homeWrapper.style.display = 'none';
             listViewContainer.style.display = 'block';
-            
+            randomBtn.style.display = 'none'; // Скрываем рандом в списке
             renderTags();
             filterAndRenderList(animate);
-            
-            adjustPadding(); // Пересчет отступа!
-            
+            adjustPadding();
             if(animate) window.scrollTo({ top: 0 });
         }
 
+        // --- SPECIFIC LISTS ---
         function showCredo(animate = true) {
+            setupSpecialList("🏛 ФУНДАМЕНТ & КРЕДО", animate);
+        }
+        function showFavorites(animate = true) {
+            setupSpecialList("⭐️ ИЗБРАННОЕ", animate);
+        }
+
+        function setupSpecialList(catName, animate) {
             currentViewState = 'list';
-            currentCategory = "🏛 ФУНДАМЕНТ & КРЕДО";
-            
+            currentCategory = catName;
             backToHomeBtn.style.display = 'flex';
             tagsContainer.style.display = 'flex';
-            
             homeWrapper.style.display = 'none';
             listViewContainer.style.display = 'block';
+            randomBtn.style.display = 'none';
             
             tagsContainer.innerHTML = '';
             const homeTag = document.createElement('div');
             homeTag.className = 'tag';
-            homeTag.innerText = 'Все';
+            homeTag.innerText = '← На Главную';
             homeTag.onclick = switchToHome;
             tagsContainer.appendChild(homeTag);
             
             filterAndRenderList(animate);
-            adjustPadding(); // Пересчет отступа!
-            
+            adjustPadding();
             if(animate) window.scrollTo({ top: 0 });
         }
 
@@ -581,7 +554,7 @@
 
         function renderHomeTiles() {
             homeTilesContainer.innerHTML = '';
-            let animDelay = 0.15;
+            let animDelay = 0.2;
             uniqueCategoriesList.forEach(catData => {
                 const tile = document.createElement('div');
                 tile.className = 'category-tile glide-entry';
@@ -607,11 +580,7 @@
             const homeTag = document.createElement('div');
             homeTag.className = 'tag';
             homeTag.innerText = 'Все';
-            homeTag.onclick = () => {
-                 currentCategory = null; 
-                 renderTags();
-                 filterAndRenderList(true);
-            };
+            homeTag.onclick = () => { currentCategory = null; renderTags(); filterAndRenderList(true); };
             if(currentCategory === null) homeTag.classList.add('active');
             tagsContainer.appendChild(homeTag);
 
@@ -635,14 +604,13 @@
             let animationIndex = 0;
             let filtered = [];
 
+            // FILTERING LOGIC
             if (currentCategory === "🏛 ФУНДАМЕНТ & КРЕДО") {
-                const credoUrls = [
-                    "https://t.me/masonsmansion/61",
-                    "https://t.me/masonsmansion/12",
-                    "https://t.me/masonsmansion/34",
-                    "https://t.me/masonsmansion/286"
-                ];
+                const credoUrls = ["https://t.me/masonsmansion/61", "https://t.me/masonsmansion/12", "https://t.me/masonsmansion/34", "https://t.me/masonsmansion/286"];
                 filtered = db.filter(item => credoUrls.includes(item.u));
+            } else if (currentCategory === "⭐️ ИЗБРАННОЕ") {
+                const favs = getFav();
+                filtered = db.filter(item => favs.includes(item.u));
             } else {
                 filtered = db.filter(item => {
                     const catMatch = currentCategory ? item.c === currentCategory : true;
@@ -651,12 +619,14 @@
                 });
             }
 
+            // SMART STUB
             if (filtered.length === 0) {
+                const msg = currentCategory === "⭐️ ИЗБРАННОЕ" ? "В избранном пока пусто." : `По запросу "<b>${searchQuery}</b>" ничего нет.`;
                 postsContainer.innerHTML = `
                     <div class="empty-state glide-entry" style="animation-delay: 0.1s">
                         <div style="font-size: 40px; margin-bottom: 10px;">🤫</div>
-                        <div>По запросу "<b>${searchQuery}</b>" в открытом доступе ничего нет.</div>
-                        <div style="margin-top: 5px; opacity: 0.7; font-size: 13px;">Такие темы мы разбираем только в Инквизиции.</div>
+                        <div>${msg}</div>
+                        <div style="margin-top: 5px; opacity: 0.7; font-size: 13px;">Ищи ответы в Инквизиции.</div>
                         <button class="btn-inq-action" onclick="tg.openTelegramLink('https://t.me/GiftsHolyInquisition_bot')">
                             ПОЛУЧИТЬ ДОСТУП ➤
                         </button>
@@ -667,58 +637,102 @@
             const header = document.createElement('div');
             header.className = animate ? 'section-header glide-entry' : 'section-header';
             if(animate) header.style.animationDelay = '0.05s';
-            // Если глобальный поиск - пишем "Результаты", если категория - имя категории
-            header.innerText = currentCategory ? currentCategory : `Результаты поиска (${filtered.length})`;
+            header.innerText = currentCategory ? currentCategory : `Результаты (${filtered.length})`;
             postsContainer.appendChild(header);
+
+            const readList = getRead();
 
             filtered.forEach(item => {
                 const div = document.createElement('div');
-                div.className = animate ? 'post-card glide-entry' : 'post-card';
+                const isRead = readList.includes(item.u);
+                
+                // CLASSES
+                let classes = animate ? 'post-card glide-entry' : 'post-card';
+                if(item.locked) classes += ' post-locked';
+                if(isRead && !item.locked) classes += ' is-read';
+                
+                div.className = classes;
                 if (animate) div.style.animationDelay = `${0.05 + (animationIndex * 0.03)}s`;
                 
+                // TITLE HTML
                 let titleHtml = item.t;
                 if (searchQuery) {
                     const regex = new RegExp(`(${searchQuery})`, 'gi');
                     titleHtml = item.t.replace(regex, '<span class="highlight">$1</span>');
                 }
+                
+                // ICONS
+                let iconsHtml = '';
+                if(item.locked) iconsHtml += '<span class="lock-icon">🔒</span>';
+                else if(isRead) iconsHtml += '<span class="read-icon">✓</span>';
 
-                div.innerHTML = `<div class="post-title">${titleHtml}</div>`;
+                div.innerHTML = `<div class="post-title">${titleHtml} <span>${iconsHtml}</span></div>`;
                 div.onclick = () => { openSheet(item); };
                 postsContainer.appendChild(div);
                 animationIndex++;
             });
         }
 
-        // ГЛОБАЛЬНЫЙ ПОИСК
+        // GLOBAL SEARCH
         searchInput.addEventListener('input', (e) => {
             searchQuery = e.target.value;
-            
-            // Если начали печатать на главной - включаем режим списка
-            if (currentViewState === 'home' && searchQuery.length > 0) {
-                switchToList(null, true);
-            }
-            // Если стерли всё и были в поиске - обновляем
-            
+            if (currentViewState === 'home' && searchQuery.length > 0) switchToList(null, true);
             filterAndRenderList(true);
         });
 
+        // --- RANDOMIZER ---
+        randomBtn.onclick = () => {
+            tg.HapticFeedback.impactOccurred('heavy');
+            // Только бесплатные посты
+            const freePosts = db.filter(item => !item.locked);
+            const randomItem = freePosts[Math.floor(Math.random() * freePosts.length)];
+            openSheet(randomItem);
+        }
+
+        // --- SHEET LOGIC ---
         function openSheet(item) {
             tg.HapticFeedback.impactOccurred('medium');
             sheetTitle.innerText = item.t;
             const catIcon = item.c.split(' ')[0];
             sheetCategory.innerHTML = `<span style="font-size: 18px;">${catIcon}</span> ${item.c.substring(catIcon.length)}`;
             
-            readBtn.onclick = () => {
-                tg.HapticFeedback.impactOccurred('light');
-                saveState();
-                tg.openTelegramLink(item.u);
-            };
+            // LOCKED vs FREE Logic
+            if(item.locked) {
+                sheetActions.style.display = 'none';
+                lockedBtn.style.display = 'block';
+                lockedBtn.onclick = () => { tg.openTelegramLink('https://t.me/GiftsHolyInquisition_bot'); };
+            } else {
+                sheetActions.style.display = 'flex';
+                lockedBtn.style.display = 'none';
+                
+                // Mark as Read
+                setRead(item.u);
+                
+                // Setup Read Button
+                readBtn.onclick = () => {
+                    tg.HapticFeedback.impactOccurred('light');
+                    saveState();
+                    tg.openTelegramLink(item.u);
+                };
 
-            shareBtn.onclick = () => {
-                tg.HapticFeedback.impactOccurred('light');
-                const shareUrl = 'https://t.me/share/url?url=' + encodeURIComponent(item.u) + '&text=' + encodeURIComponent(item.t);
-                tg.openTelegramLink(shareUrl);
-            };
+                // Setup Share Button
+                shareBtn.onclick = () => {
+                    tg.HapticFeedback.impactOccurred('light');
+                    const shareUrl = 'https://t.me/share/url?url=' + encodeURIComponent(item.u) + '&text=' + encodeURIComponent(item.t);
+                    tg.openTelegramLink(shareUrl);
+                };
+
+                // Setup Fav Button
+                const isFav = getFav().includes(item.u);
+                updateFavBtnStyle(isFav);
+                favSheetBtn.onclick = () => {
+                    tg.HapticFeedback.impactOccurred('light');
+                    const newState = toggleFav(item.u);
+                    updateFavBtnStyle(newState);
+                    // Если мы в списке избранного - обновляем его сразу
+                    if(currentCategory === "⭐️ ИЗБРАННОЕ") filterAndRenderList(false);
+                };
+            }
 
             upsellBtn.onclick = () => {
                 tg.HapticFeedback.impactOccurred('light');
@@ -726,7 +740,7 @@
                 tg.openTelegramLink('https://t.me/GiftsHolyInquisition_bot');
             }
             
-            const related = db.filter(p => p.c === item.c && p.u !== item.u).sort(() => 0.5 - Math.random()).slice(0, 3);
+            const related = db.filter(p => p.c === item.c && p.u !== item.u && !p.locked).sort(() => 0.5 - Math.random()).slice(0, 3);
             relatedContainer.innerHTML = '';
             if (related.length === 0) relatedContainer.innerHTML = '<div style="color:#666; font-size:13px;">Нет похожих материалов</div>';
             else {
@@ -740,7 +754,23 @@
             }
             modalOverlay.classList.add('active');
             postSheet.classList.add('active');
+            
+            // Если пост был не прочитан, обновим список на фоне, чтобы появилась галочка
+            if(!item.locked && !document.querySelector(`.post-card[onclick*="${item.u}"]`)?.classList.contains('is-read')) {
+                 filterAndRenderList(false);
+            }
         }
+
+        function updateFavBtnStyle(isActive) {
+            if(isActive) {
+                favSheetBtn.classList.add('active');
+                favSheetBtn.innerText = '⭐️'; // Filled star
+            } else {
+                favSheetBtn.classList.remove('active');
+                favSheetBtn.innerText = '☆'; // Empty star
+            }
+        }
+
         function closeSheet() { modalOverlay.classList.remove('active'); postSheet.classList.remove('active'); }
         modalOverlay.addEventListener('click', closeSheet);
 
@@ -755,12 +785,16 @@
             showCredo(true);
         });
 
-        // Инициализация
-        renderHomeTiles();
-        adjustPadding(); // Сразу считаем отступ на старте
-        restoreState();
+        document.getElementById('favBtn').addEventListener('click', () => {
+            tg.HapticFeedback.impactOccurred('medium');
+            showFavorites(true);
+        });
 
-        // Пересчет при ресайзе (на всякий случай)
+        // INIT
+        updateFavCard();
+        renderHomeTiles();
+        adjustPadding();
+        restoreState();
         window.addEventListener('resize', adjustPadding);
 
     </script>
