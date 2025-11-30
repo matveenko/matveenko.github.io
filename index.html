@@ -25,41 +25,44 @@
             color: var(--text-main);
             padding-bottom: 40px;
             opacity: 0; 
-            animation: fadeInPage 0.5s ease-out forwards;
+            animation: fadeInPage 0.3s ease-out forwards; /* Ускорил появление страницы */
             min-height: 100vh;
         }
 
         @keyframes fadeInPage { to { opacity: 1; } }
         @keyframes glideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .glide-entry { opacity: 0; animation: glideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        
+        /* Класс для анимации. Если его нет, элемент появляется мгновенно */
+        .glide-entry { opacity: 0; animation: glideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        
         @keyframes shimmer { 0% { transform: translateX(-100%) skewX(-15deg); } 100% { transform: translateX(200%) skewX(-15deg); } }
 
         /* --- HEADER --- */
         .header-container {
             position: fixed; top: 0; left: 0; width: 100%;
-            background: rgba(26, 26, 26, 0.95);
-            backdrop-filter: blur(10px);
+            background: rgba(26, 26, 26, 0.98); /* Почти непрозрачный для производительности */
             z-index: 100;
             padding: 15px 15px 10px 15px;
             border-bottom: 1px solid #333;
             display: none;
+            /* Убрал блюр, так как он жрет ресурсы при скролле на старых телефонах */
         }
         .header-top-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-        .back-btn { padding: 10px 15px; background: #333; border-radius: var(--radius); color: var(--accent-sunray); font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; transition: all 0.2s; }
-        .back-btn:active { background: #444; transform: scale(0.97); }
-        .search-box { flex: 1; background: #252525; border: 1px solid #3a3a3a; border-radius: var(--radius); padding: 12px 15px; color: #fff; font-size: 15px; transition: all 0.3s; }
-        .search-box:focus { border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(157, 0, 255, 0.2); }
+        .back-btn { padding: 10px 15px; background: #333; border-radius: var(--radius); color: var(--accent-sunray); font-weight: 600; font-size: 14px; cursor: pointer; display: flex; align-items: center; transition: background 0.2s; }
+        .back-btn:active { background: #444; }
+        .search-box { flex: 1; background: #252525; border: 1px solid #3a3a3a; border-radius: var(--radius); padding: 12px 15px; color: #fff; font-size: 15px; }
+        .search-box:focus { border-color: var(--accent-purple); }
         .tags-wrapper { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
         .tags-wrapper::-webkit-scrollbar { display: none; }
-        .tag { white-space: nowrap; padding: 8px 16px; background: #333; border-radius: 30px; font-size: 13px; font-weight: 600; color: #bbb; cursor: pointer; transition: all 0.3s; border: 1px solid transparent; }
-        .tag.active { background: var(--accent-purple); color: #fff; box-shadow: 0 4px 15px rgba(157, 0, 255, 0.4); }
+        .tag { white-space: nowrap; padding: 8px 16px; background: #333; border-radius: 30px; font-size: 13px; font-weight: 600; color: #bbb; cursor: pointer; border: 1px solid transparent; transition: background 0.2s; }
+        .tag.active { background: var(--accent-purple); color: #fff; }
 
         /* --- MAIN CONTENT --- */
         .main-content { padding: 20px 15px; padding-top: 20px; }
 
-        /* --- SPECIAL CARDS (Inquisition & Credo) --- */
+        /* --- SPECIAL CARDS --- */
         .special-card {
-            margin-bottom: 20px; /* Отступ между карточками */
+            margin-bottom: 20px;
             border-radius: var(--radius);
             padding: 25px 20px;
             cursor: pointer;
@@ -68,51 +71,45 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            transition: transform 0.2s;
+            transition: transform 0.1s;
             min-height: 100px;
+            /* Упрощенная тень для производительности */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         .special-card::after {
             content: ''; position: absolute; top: 0; left: 0; width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
             animation: shimmer 3s infinite cubic-bezier(0.4, 0.0, 0.2, 1);
         }
-        .special-card:active { transform: scale(0.97); }
+        .special-card:active { transform: scale(0.98); }
 
-        /* INQUISITION STYLE (RED) */
         .card-red {
             background: linear-gradient(135deg, #420000 0%, #1a0000 100%);
             border: 1px solid var(--danger-red);
             border-left: 6px solid var(--danger-red);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(207, 10, 10, 0.2);
         }
         
-        /* CREDO STYLE (GOLD) */
         .card-gold {
             background: linear-gradient(135deg, #3a2e00 0%, #1a1a1a 100%);
             border: 1px solid var(--accent-sunray);
             border-left: 6px solid var(--accent-sunray);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), inset 0 0 15px rgba(227, 188, 87, 0.15);
         }
         
-        /* Titles inside special cards */
         .sp-title {
             font-weight: 900; font-size: 19px;
             text-transform: uppercase; letter-spacing: 1px;
             margin-bottom: 6px; z-index: 2;
         }
-        .red-text { color: #ff4d4d; text-shadow: 0 2px 10px rgba(207, 10, 10, 0.5); }
-        .gold-text { color: var(--accent-sunray); text-shadow: 0 2px 10px rgba(227, 188, 87, 0.4); }
-
+        .red-text { color: #ff4d4d; }
+        .gold-text { color: var(--accent-sunray); }
         .sp-desc { color: #ddd; font-size: 13px; line-height: 1.3; z-index: 2; opacity: 0.9; font-weight: 500; }
-        
-        /* Background Icons */
         .sp-bg-icon {
             position: absolute; right: -10px; bottom: -15px;
             font-size: 80px; opacity: 0.1; transform: rotate(-20deg);
             filter: grayscale(100%); z-index: 0; pointer-events: none;
         }
 
-        /* --- HOME TILES GRID --- */
+        /* --- HOME TILES --- */
         #homeTilesContainer { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); 
@@ -124,47 +121,40 @@
             background: linear-gradient(145deg, #2a2a2a, #222222);
             border-radius: var(--radius); padding: 25px 20px; cursor: pointer;
             position: relative; overflow: hidden; border: 1px solid #333;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
             display: flex; flex-direction: column; justify-content: space-between;
             min-height: 140px;
+            transition: transform 0.1s;
         }
-        .category-tile:active { transform: scale(0.96); border-color: var(--accent-sunray); background: linear-gradient(145deg, rgba(227, 188, 87, 0.15), rgba(157, 0, 255, 0.15)); }
-        
+        .category-tile:active { transform: scale(0.98); background: #333; border-color: var(--accent-sunray); }
         .tile-icon { font-size: 32px; margin-bottom: 15px; }
-        .tile-title { 
-            font-size: 15px; font-weight: 800; color: #fff; 
-            text-transform: uppercase; letter-spacing: 0.5px; 
-            line-height: 1.2;
-            word-break: break-word; hyphens: auto; 
-        }
+        .tile-title { font-size: 15px; font-weight: 800; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2; word-break: break-word; hyphens: auto; }
         .tile-count { font-size: 12px; color: #777; margin-top: 8px; font-weight: 500; }
 
         /* --- LIST VIEW --- */
         #listViewContainer { display: none; }
         .section-header { margin-top: 30px; margin-bottom: 15px; display: flex; align-items: center; color: var(--accent-sunray); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1.2px; }
-        .section-header::before { content: ''; display: inline-block; width: 4px; height: 18px; background: var(--accent-purple); margin-right: 12px; border-radius: 4px; box-shadow: 0 0 10px var(--accent-purple); }
-        .posts-list { display: flex; flex-direction: column; gap: 12px; perspective: 1000px; }
-        .post-card { background-color: var(--card-bg); padding: 18px; border-radius: var(--radius); cursor: pointer; position: relative; overflow: hidden; border: 1px solid #3a3a3a; transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .post-card:active { transform: scale(0.98); background-color: #333; border-color: var(--accent-sunray); }
+        .section-header::before { content: ''; display: inline-block; width: 4px; height: 18px; background: var(--accent-purple); margin-right: 12px; border-radius: 4px; }
+        .posts-list { display: flex; flex-direction: column; gap: 12px; } /* Убрал perspective для скорости */
+        .post-card { background-color: var(--card-bg); padding: 18px; border-radius: var(--radius); cursor: pointer; position: relative; overflow: hidden; border: 1px solid #3a3a3a; }
+        .post-card:active { background-color: #383838; border-color: var(--accent-sunray); }
         .post-title { font-size: 15px; line-height: 1.5; font-weight: 600; color: #e0e0e0; }
 
         /* --- BOTTOM SHEET --- */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); z-index: 500; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 500; opacity: 0; visibility: hidden; transition: opacity 0.2s; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
-        .bottom-sheet { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--sheet-bg); border-top-left-radius: 25px; border-top-right-radius: 25px; padding: 25px 20px 45px 20px; z-index: 600; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 -10px 50px rgba(0,0,0,0.7); max-height: 85vh; overflow-y: auto; border-top: 1px solid #333; }
+        .bottom-sheet { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--sheet-bg); border-top-left-radius: 25px; border-top-right-radius: 25px; padding: 25px 20px 45px 20px; z-index: 600; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1); box-shadow: 0 -10px 50px rgba(0,0,0,0.7); max-height: 85vh; overflow-y: auto; border-top: 1px solid #333; }
         .bottom-sheet.active { transform: translateY(0); }
         .sheet-handle { width: 50px; height: 6px; background: #444; border-radius: 10px; margin: 0 auto 25px auto; }
         .sheet-category { color: var(--accent-purple); font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
         .sheet-title { font-size: 24px; font-weight: 800; line-height: 1.3; margin-bottom: 30px; color: #fff; }
-        .btn-main { display: block; width: 100%; text-align: center; background: var(--accent-sunray); color: #000; font-weight: 800; font-size: 17px; text-transform: uppercase; padding: 18px; border-radius: 16px; border: none; margin-bottom: 35px; cursor: pointer; box-shadow: 0 8px 25px rgba(227, 188, 87, 0.4); transition: transform 0.1s; }
+        .btn-main { display: block; width: 100%; text-align: center; background: var(--accent-sunray); color: #000; font-weight: 800; font-size: 17px; text-transform: uppercase; padding: 18px; border-radius: 16px; border: none; margin-bottom: 35px; cursor: pointer; transition: transform 0.1s; }
         .btn-main:active { transform: scale(0.97); }
         .related-section { border-top: 1px solid #333; padding-top: 25px; }
         .related-header { font-size: 14px; color: #888; margin-bottom: 18px; font-weight: 700; text-transform: uppercase; }
         .related-item { background: #2a2a2a; padding: 14px 18px; border-radius: 12px; margin-bottom: 12px; font-size: 14px; color: #ddd; display: flex; align-items: center; justify-content: space-between; border: 1px solid #3a3a3a; font-weight: 600; }
-        .related-item:active { background: #333; border-color: #555; }
+        .related-item:active { background: #333; }
         .related-arrow { color: var(--accent-purple); font-weight: bold; }
-        .upsell-btn { background: linear-gradient(135deg, rgba(157, 0, 255, 0.15), rgba(157, 0, 255, 0.05)); border: 1px solid var(--accent-purple); color: #cba3ff; padding: 16px; border-radius: 16px; text-align: center; font-size: 15px; font-weight: 700; margin-top: 25px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(157, 0, 255, 0.1); }
+        .upsell-btn { background: linear-gradient(135deg, rgba(157, 0, 255, 0.15), rgba(157, 0, 255, 0.05)); border: 1px solid var(--accent-purple); color: #cba3ff; padding: 16px; border-radius: 16px; text-align: center; font-size: 15px; font-weight: 700; margin-top: 25px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .empty-state { text-align: center; color: #666; margin-top: 80px; font-size: 15px; font-weight: 500; }
     </style>
 </head>
@@ -180,20 +170,19 @@
 
     <div class="main-content">
         
-        <div class="special-card card-red glide-entry" id="inqBtn" style="animation-delay: 0.1s;">
+        <div class="special-card card-red glide-entry" id="inqBtn" style="animation-delay: 0.05s;">
             <div class="sp-title red-text">🩸 Дары Святой Инквизиции</div>
             <div class="sp-desc">Закрытый канал. Доступ только через бота. Жми, если готов.</div>
             <div class="sp-bg-icon">⚖️</div>
         </div>
 
-        <div class="special-card card-gold glide-entry" id="credoBtn" style="animation-delay: 0.2s;">
-            <div class="sp-title gold-text">🏛 НАШЕ КРЕДО</div>
-            <div class="sp-desc">О нас и нашей деятельности.</div>
+        <div class="special-card card-gold glide-entry" id="credoBtn" style="animation-delay: 0.1s;">
+            <div class="sp-title gold-text">🏛 ФУНДАМЕНТ & КРЕДО</div>
+            <div class="sp-desc">Кто такой Андрэ, философия канала, новичкам и биохимия успеха.</div>
             <div class="sp-bg-icon">🧭</div>
         </div>
 
         <div id="homeTilesContainer"></div>
-        
         <div id="listViewContainer">
              <div class="posts-list" id="postsContainer"></div>
         </div>
@@ -219,6 +208,9 @@
         tg.expand();
         tg.setHeaderColor('#1a1a1a');
         tg.setBackgroundColor('#1a1a1a');
+
+        const STATE_KEY = 'mm_hub_state_v3';
+        const STATE_TTL = 15 * 60 * 1000; // 15 минут
 
         const db = [
             { t: "Кто я такой? (История Андрэ)", u: "https://t.me/masonsmansion/61", c: "⚔️ Жизнестойкость" },
@@ -364,6 +356,72 @@
         const tagsContainer = document.getElementById('tagsContainer');
         const mainContent = document.querySelector('.main-content');
         const credoBtn = document.getElementById('credoBtn');
+        const inqBtn = document.getElementById('inqBtn');
+
+        // --- СОХРАНЕНИЕ СОСТОЯНИЯ (OPTIMIZED) ---
+        function saveState() {
+            try {
+                const state = {
+                    view: currentViewState,
+                    category: currentCategory,
+                    scroll: window.scrollY,
+                    search: searchQuery,
+                    ts: Date.now()
+                };
+                localStorage.setItem(STATE_KEY, JSON.stringify(state));
+            } catch (e) { console.log('Storage failed', e); }
+        }
+
+        function restoreState() {
+            try {
+                const raw = localStorage.getItem(STATE_KEY);
+                if (!raw) return;
+                const state = JSON.parse(raw);
+                if (Date.now() - state.ts > STATE_TTL) {
+                    localStorage.removeItem(STATE_KEY);
+                    return;
+                }
+
+                // ВОССТАНАВЛИВАЕМ
+                if (state.view === 'list') {
+                    if (state.category === "🏛 ФУНДАМЕНТ & КРЕДО") {
+                        // Симуляция клика по Кредо
+                        currentViewState = 'list';
+                        currentCategory = state.category;
+                        homeTilesContainer.style.display = 'none';
+                        credoBtn.style.display = 'none';
+                        inqBtn.style.display = 'none'; // Скрываем инквизицию тоже если надо
+                        listHeader.style.display = 'block';
+                        listViewContainer.style.display = 'block';
+                        mainContent.style.paddingTop = (listHeader.offsetHeight + 20) + 'px';
+                        
+                        tagsContainer.innerHTML = '';
+                        const homeTag = document.createElement('div');
+                        homeTag.className = 'tag';
+                        homeTag.innerText = '← На Главную';
+                        homeTag.onclick = switchToHome;
+                        tagsContainer.appendChild(homeTag);
+                        
+                        // ВАЖНО: animate = false
+                        filterAndRenderList(false); 
+                    } else {
+                        // Обычный список
+                        switchToList(state.category, false); // false = без анимации
+                    }
+                    
+                    if (state.search) {
+                        searchQuery = state.search;
+                        searchInput.value = state.search;
+                        filterAndRenderList(false);
+                    }
+
+                    // Скролл восстанавливаем асинхронно, чтобы верстка успела встать
+                    setTimeout(() => {
+                        window.scrollTo(0, state.scroll);
+                    }, 10);
+                }
+            } catch (e) { console.log('Restore failed', e); }
+        }
 
         function switchToHome() {
             currentViewState = 'home';
@@ -374,29 +432,33 @@
             listViewContainer.style.display = 'none';
             homeTilesContainer.style.display = 'grid';
             mainContent.style.paddingTop = '20px';
-            credoBtn.style.display = 'flex'; // Показываем кнопку Кредо
+            credoBtn.style.display = 'flex';
+            inqBtn.style.display = 'flex';
             window.scrollTo({ top: 0 });
             tg.HapticFeedback.impactOccurred('light');
+            // Очищаем состояние при выходе на главную
+            localStorage.removeItem(STATE_KEY);
         }
 
-        function switchToList(category) {
+        function switchToList(category, animate = true) {
             currentViewState = 'list';
             currentCategory = category;
             homeTilesContainer.style.display = 'none';
-            credoBtn.style.display = 'none'; // Скрываем кнопку Кредо в списке
+            credoBtn.style.display = 'none';
+            inqBtn.style.display = 'none';
             listHeader.style.display = 'block';
             listViewContainer.style.display = 'block';
             mainContent.style.paddingTop = (listHeader.offsetHeight + 20) + 'px';
             renderTags();
-            filterAndRenderList(true);
-            window.scrollTo({ top: 0 });
+            filterAndRenderList(animate);
+            if(animate) window.scrollTo({ top: 0 });
         }
 
         backToHomeBtn.addEventListener('click', switchToHome);
 
         function renderHomeTiles() {
             homeTilesContainer.innerHTML = '';
-            let animDelay = 0.3; // Чуть позже, так как сверху карточки
+            let animDelay = 0.15;
             uniqueCategoriesList.forEach(catData => {
                 const tile = document.createElement('div');
                 tile.className = 'category-tile glide-entry';
@@ -440,12 +502,12 @@
             });
         }
 
+        // Параметр animate управляет тяжелыми классами
         function filterAndRenderList(animate = true) {
             postsContainer.innerHTML = '';
             let animationIndex = 0;
             let filtered = [];
 
-            // Если категория спец. (CREDO), фильтруем по конкретным ссылкам
             if (currentCategory === "🏛 ФУНДАМЕНТ & КРЕДО") {
                 const credoUrls = [
                     "https://t.me/masonsmansion/61",
@@ -455,7 +517,6 @@
                 ];
                 filtered = db.filter(item => credoUrls.includes(item.u));
             } else {
-                // Обычная фильтрация
                 filtered = db.filter(item => {
                     const catMatch = item.c === currentCategory;
                     const searchMatch = item.t.toLowerCase().includes(searchQuery.toLowerCase());
@@ -464,21 +525,24 @@
             }
 
             if (filtered.length === 0) {
-                postsContainer.innerHTML = '<div class="empty-state glide-entry" style="animation-delay: 0.1s">Пусто.</div>';
+                postsContainer.innerHTML = '<div class="empty-state">Пусто.</div>';
                 return;
             }
 
             const header = document.createElement('div');
+            // Если animate=false, не добавляем glide-entry
             header.className = animate ? 'section-header glide-entry' : 'section-header';
-            if(animate) header.style.animationDelay = '0.1s';
+            if(animate) header.style.animationDelay = '0.05s';
             header.innerText = currentCategory;
             postsContainer.appendChild(header);
-            animationIndex++;
 
             filtered.forEach(item => {
                 const div = document.createElement('div');
+                // ОПТИМИЗАЦИЯ: Без анимации класс проще
                 div.className = animate ? 'post-card glide-entry' : 'post-card';
-                if (animate) { div.style.animationDelay = `${0.1 + (animationIndex * 0.05)}s`; }
+                if (animate) { 
+                    div.style.animationDelay = `${0.05 + (animationIndex * 0.03)}s`; 
+                }
                 div.innerHTML = `<div class="post-title">${item.t}</div>`;
                 div.onclick = () => { openSheet(item); };
                 postsContainer.appendChild(div);
@@ -488,7 +552,7 @@
 
         searchInput.addEventListener('input', (e) => {
             searchQuery = e.target.value;
-            filterAndRenderList(true);
+            filterAndRenderList(true); // При поиске анимация ок
         });
 
         const modalOverlay = document.getElementById('modalOverlay');
@@ -506,13 +570,15 @@
             sheetCategory.innerHTML = `<span style="font-size: 18px;">${catIcon}</span> ${item.c.substring(catIcon.length)}`;
             readBtn.onclick = () => {
                 tg.HapticFeedback.impactOccurred('light');
+                saveState(); // Сохраняем состояние ПЕРЕД уходом
                 tg.openTelegramLink(item.u);
             };
             upsellBtn.onclick = () => {
                 tg.HapticFeedback.impactOccurred('light');
+                saveState(); // Сохраняем состояние ПЕРЕД уходом
                 tg.openTelegramLink('https://t.me/GiftsHolyInquisition_bot');
             }
-            // Похожие: берем из той же категории, если это не Кредо (у Кредо категория в базе другая)
+            
             const related = db.filter(p => p.c === item.c && p.u !== item.u).sort(() => 0.5 - Math.random()).slice(0, 3);
             relatedContainer.innerHTML = '';
             if (related.length === 0) relatedContainer.innerHTML = '<div style="color:#666; font-size:13px;">Нет похожих материалов</div>';
@@ -521,7 +587,10 @@
                     const div = document.createElement('div');
                     div.className = 'related-item';
                     div.innerHTML = `<span>${rel.t}</span> <span class="related-arrow">→</span>`;
-                    div.onclick = () => { openSheet(rel); };
+                    div.onclick = () => { 
+                        // При переходе внутри шторки сохранять не надо, мы еще тут
+                        openSheet(rel); 
+                    };
                     relatedContainer.appendChild(div);
                 });
             }
@@ -531,25 +600,23 @@
         function closeSheet() { modalOverlay.classList.remove('active'); postSheet.classList.remove('active'); }
         modalOverlay.addEventListener('click', closeSheet);
 
-        // КЛИК ПО ИНКВИЗИЦИИ
         document.getElementById('inqBtn').addEventListener('click', () => {
             tg.HapticFeedback.impactOccurred('heavy');
+            saveState();
             tg.openTelegramLink('https://t.me/GiftsHolyInquisition_bot');
         });
 
-        // КЛИК ПО КРЕДО
         credoBtn.addEventListener('click', () => {
             tg.HapticFeedback.impactOccurred('medium');
-            // Переключаем на вид списка, но с особой "категорией"
             currentViewState = 'list';
             currentCategory = "🏛 ФУНДАМЕНТ & КРЕДО";
             homeTilesContainer.style.display = 'none';
             credoBtn.style.display = 'none';
+            inqBtn.style.display = 'none';
             listHeader.style.display = 'block';
             listViewContainer.style.display = 'block';
             mainContent.style.paddingTop = (listHeader.offsetHeight + 20) + 'px';
             
-            // В тегах оставляем только кнопку "Назад"
             tagsContainer.innerHTML = '';
             const homeTag = document.createElement('div');
             homeTag.className = 'tag';
@@ -561,7 +628,11 @@
             window.scrollTo({ top: 0 });
         });
 
+        // ЗАПУСК
         renderHomeTiles();
+        // Пытаемся восстановить (если вернулись из канала)
+        restoreState();
+
     </script>
 </body>
 </html>
