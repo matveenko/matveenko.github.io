@@ -3,174 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Mental Meridian Navigation</title>
+    <title>Mental Meridian Hub</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            --bg-color: #272727;
-            --card-bg: #333333;
+            --bg-color: #1a1a1a; /* Чуть темнее фон для глубины */
+            --card-bg: #2d2d2d;
             --text-main: #FFFFFF;
             --text-sec: #AAAAAA;
             --accent-sunray: #E3BC57;
             --accent-purple: #9D00FF;
             --danger-red: #cf0a0a;
-            --radius: 12px;
+            --radius: 16px; /* Радиус побольше для премиум фила */
             --sheet-bg: #1f1f1f;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; outline: none; }
         
         body {
             background-color: var(--bg-color);
             color: var(--text-main);
-            padding-top: 130px; 
             padding-bottom: 40px;
             opacity: 0; 
             animation: fadeInPage 0.5s ease-out forwards;
+            min-height: 100vh;
         }
 
         @keyframes fadeInPage { to { opacity: 1; } }
-        @keyframes glideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .glide-entry { opacity: 0; animation: glideUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+        @keyframes glideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .glide-entry { opacity: 0; animation: glideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
         @keyframes shimmer { 0% { transform: translateX(-100%) skewX(-15deg); } 100% { transform: translateX(200%) skewX(-15deg); } }
 
-        /* --- Header & Search --- */
+        /* --- HEADER (Sticky) --- */
         .header-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%;
-            background-color: var(--bg-color);
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: rgba(26, 26, 26, 0.95); /* Полупрозрачный фон */
+            backdrop-filter: blur(10px); /* Эффект матового стекла */
             z-index: 100;
-            padding: 15px 15px 5px 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            padding: 15px 15px 10px 15px;
+            border-bottom: 1px solid #333;
+            display: none; /* Скрыт на главной */
         }
+
+        .header-top-row {
+            display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+        }
+
+        .back-btn {
+            padding: 10px 15px; background: #333; border-radius: var(--radius);
+            color: var(--accent-sunray); font-weight: 600; font-size: 14px;
+            cursor: pointer; display: flex; align-items: center; transition: all 0.2s;
+        }
+        .back-btn:active { background: #444; transform: scale(0.97); }
 
         .search-box {
-            width: 100%;
-            background: #1E1E1E;
-            border: 1px solid #444;
-            border-radius: var(--radius);
-            padding: 12px 15px;
-            color: #fff;
-            font-size: 16px;
-            outline: none;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            flex: 1; background: #252525; border: 1px solid #3a3a3a;
+            border-radius: var(--radius); padding: 12px 15px; color: #fff;
+            font-size: 15px; transition: all 0.3s;
         }
-        .search-box:focus { border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(157, 0, 255, 0.3); transform: scale(1.01); }
+        .search-box:focus { border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(157, 0, 255, 0.2); }
 
-        .tags-wrapper { display: flex; gap: 8px; overflow-x: auto; padding: 15px 0; scrollbar-width: none; }
+        .tags-wrapper { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
         .tags-wrapper::-webkit-scrollbar { display: none; }
-        .tag { white-space: nowrap; padding: 8px 14px; background: #3a3a3a; border-radius: 8px; font-size: 13px; font-weight: 600; color: #bbb; cursor: pointer; transition: all 0.3s; border: 1px solid transparent; }
-        .tag.active { background: var(--accent-purple); color: #fff; border-color: rgba(255,255,255,0.2); box-shadow: 0 4px 15px rgba(157, 0, 255, 0.4); transform: translateY(-2px); }
+        .tag { white-space: nowrap; padding: 8px 16px; background: #333; border-radius: 30px; font-size: 13px; font-weight: 600; color: #bbb; cursor: pointer; transition: all 0.3s; border: 1px solid transparent; }
+        .tag.active { background: var(--accent-purple); color: #fff; box-shadow: 0 4px 15px rgba(157, 0, 255, 0.4); }
 
-        /* --- Inquisition Card --- */
+        /* --- MAIN CONTENT CONTAINER --- */
+        .main-content {
+            padding: 20px 15px;
+            /* Отступ сверху будет меняться JS-ом в зависимости от экрана */
+            padding-top: 20px; 
+        }
+
+        /* --- INQUISITION CARD (MANTICORE EDITION) --- */
         .inquisition-card {
-            margin: 10px 15px 25px 15px;
-            background: linear-gradient(135deg, #420000 0%, #1a0000 100%);
-            border: 1px solid var(--danger-red); border-left: 6px solid var(--danger-red);
-            border-radius: var(--radius); padding: 20px;
+            background: linear-gradient(135deg, #4a0000 0%, #1a0000 100%);
+            border: 1px solid #5a0000; border-left: 4px solid var(--danger-red);
+            border-radius: var(--radius); padding: 25px 20px;
             cursor: pointer; position: relative; overflow: hidden;
-            box-shadow: 0 10px 25px rgba(207, 10, 10, 0.3);
-            display: flex; flex-direction: column; justify-content: center;
-        }
-        .inquisition-card::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            animation: shimmer 3s infinite cubic-bezier(0.4, 0.0, 0.2, 1);
-        }
-        .inquisition-card:active { transform: scale(0.97); }
-        .inq-title { color: #ff4d4d; font-weight: 900; font-size: 18px; text-transform: uppercase; margin-bottom: 8px; z-index: 2; text-shadow: 0 2px 10px rgba(207, 10, 10, 0.5); }
-        .inq-desc { color: #ffcccc; font-size: 14px; line-height: 1.3; z-index: 2; opacity: 0.9; }
-        .inq-bg-icon { position: absolute; right: -10px; bottom: -15px; font-size: 80px; opacity: 0.1; transform: rotate(-20deg); filter: grayscale(100%); z-index: 0; }
-
-        /* --- List Styles --- */
-        .posts-list { padding: 0 15px; display: flex; flex-direction: column; gap: 10px; perspective: 1000px; }
-        .section-header { margin-top: 25px; margin-bottom: 12px; padding-left: 10px; display: flex; align-items: center; color: var(--accent-sunray); font-weight: 800; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; border-left: 3px solid var(--accent-purple); text-shadow: 0 2px 10px rgba(227, 188, 87, 0.3); }
-        .section-header::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--accent-purple), transparent); margin-left: 15px; opacity: 0.5; }
-        
-        .post-card {
-            background-color: var(--card-bg); padding: 16px; border-radius: var(--radius);
-            cursor: pointer; position: relative; overflow: hidden;
-            transition: all 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .post-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background-color: #444; transition: background-color 0.3s; }
-        .post-card:active { transform: scale(0.98); background-color: #383838; }
-        .post-card:active::before { background-color: var(--accent-sunray); }
-        .post-title { font-size: 15px; line-height: 1.4; font-weight: 500; margin-left: 8px; }
-        .empty-state { text-align: center; color: #666; margin-top: 60px; font-size: 14px; }
-
-        /* --- BOTTOM SHEET / MODAL (The Upsell Layer) --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
-            z-index: 500; opacity: 0; visibility: hidden;
-            transition: all 0.3s;
-        }
-        .modal-overlay.active { opacity: 1; visibility: visible; }
-
-        .bottom-sheet {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background-color: var(--sheet-bg);
-            border-top-left-radius: 20px; border-top-right-radius: 20px;
-            padding: 25px 20px 40px 20px;
-            z-index: 600;
-            transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
-            max-height: 85vh; overflow-y: auto;
-        }
-        .bottom-sheet.active { transform: translateY(0); }
-
-        .sheet-handle { width: 40px; height: 5px; background: #444; border-radius: 10px; margin: 0 auto 20px auto; }
-        
-        .sheet-category { color: var(--accent-purple); font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
-        .sheet-title { font-size: 22px; font-weight: 800; line-height: 1.3; margin-bottom: 25px; color: #fff; }
-
-        .btn-main {
-            display: block; width: 100%; text-align: center;
-            background: var(--accent-sunray); color: #000;
-            font-weight: 800; font-size: 16px; text-transform: uppercase;
-            padding: 18px; border-radius: 14px; border: none;
-            margin-bottom: 30px; cursor: pointer;
-            box-shadow: 0 5px 20px rgba(227, 188, 87, 0.3);
-            transition: transform 0.1s;
-        }
-        .btn-main:active { transform: scale(0.97); }
-
-        .related-section { border-top: 1px solid #333; padding-top: 20px; }
-        .related-header { font-size: 14px; color: #888; margin-bottom: 15px; font-weight: 600; }
-        
-        .related-item {
-            background: #2a2a2a; padding: 12px; border-radius: 10px;
-            margin-bottom: 10px; font-size: 14px; color: #ddd;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(207, 10, 10, 0.2);
             display: flex; align-items: center; justify-content: space-between;
-            border-left: 3px solid transparent;
+            margin-bottom: 30px; transition: transform 0.2s;
         }
-        .related-item:active { background: #333; }
-        .related-arrow { color: var(--accent-purple); }
+        .inquisition-card::after { content: ''; position: absolute; top: 0; left: 0; width: 70%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255, 77, 77, 0.2), transparent); animation: shimmer 4s infinite cubic-bezier(0.4, 0.0, 0.2, 1); pointer-events: none; }
+        .inquisition-card:active { transform: scale(0.98); }
+        
+        .inq-text { z-index: 2; flex: 1; }
+        .inq-title { color: #ff6b6b; font-weight: 900; font-size: 20px; text-transform: uppercase; margin-bottom: 6px; letter-spacing: 1px; text-shadow: 0 2px 15px rgba(207, 10, 10, 0.7); }
+        .inq-desc { color: #ffcccc; font-size: 13px; opacity: 0.8; font-weight: 500; }
+        
+        /* Сюда вставлять картинку мантикоры */
+        .inq-icon-img {
+            width: 80px; height: 80px; object-fit: contain;
+            filter: drop-shadow(0 0 10px rgba(207, 10, 10, 0.5));
+            z-index: 2; margin-left: 15px;
+        }
 
-        /* Кнопка подписки (Upsell) */
-        .upsell-btn {
-            background: rgba(157, 0, 255, 0.1); border: 1px solid var(--accent-purple);
-            color: var(--accent-purple); padding: 12px; border-radius: 10px;
-            text-align: center; font-size: 14px; font-weight: 600; margin-top: 20px;
-            width: 100%; display: block;
+        /* --- HOME TILES GRID --- */
+        #homeTilesContainer {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Две колонки */
+            gap: 15px;
         }
+
+        .category-tile {
+            background: linear-gradient(145deg, #2a2a2a, #222222);
+            border-radius: var(--radius);
+            padding: 25px 20px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #333;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex; flex-direction: column; justify-content: space-between;
+            min-height: 140px;
+        }
+        
+        /* Эффект при наведении/нажатии - меняем градиент */
+        .category-tile:active {
+            transform: scale(0.96);
+            border-color: var(--accent-sunray);
+            /* Подсветка Sunray + Purple */
+            background: linear-gradient(145deg, rgba(227, 188, 87, 0.15), rgba(157, 0, 255, 0.15));
+        }
+
+        .tile-icon { font-size: 32px; margin-bottom: 15px; }
+        .tile-title {
+            font-size: 16px; font-weight: 800; color: #fff;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            line-height: 1.2;
+        }
+        .tile-count {
+            font-size: 12px; color: #777; margin-top: 8px; font-weight: 500;
+        }
+
+        /* --- LIST VIEW STYLES --- */
+        #listViewContainer { display: none; /* Скрыт по умолчанию */ }
+
+        .section-header { margin-top: 30px; margin-bottom: 15px; display: flex; align-items: center; color: var(--accent-sunray); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1.2px; }
+        .section-header::before { content: ''; display: inline-block; width: 4px; height: 18px; background: var(--accent-purple); margin-right: 12px; border-radius: 4px; box-shadow: 0 0 10px var(--accent-purple); }
+        
+        .posts-list { display: flex; flex-direction: column; gap: 12px; perspective: 1000px; }
+        .post-card {
+            background-color: var(--card-bg); padding: 18px; border-radius: var(--radius);
+            cursor: pointer; position: relative; overflow: hidden; border: 1px solid #3a3a3a;
+            transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .post-card:active { transform: scale(0.98); background-color: #333; border-color: var(--accent-sunray); }
+        .post-title { font-size: 15px; line-height: 1.5; font-weight: 600; color: #e0e0e0; }
+
+        /* --- BOTTOM SHEET (Шторка) --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(5px); z-index: 500; opacity: 0; visibility: hidden; transition: all 0.3s; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .bottom-sheet { position: fixed; bottom: 0; left: 0; width: 100%; background-color: var(--sheet-bg); border-top-left-radius: 25px; border-top-right-radius: 25px; padding: 25px 20px 45px 20px; z-index: 600; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 -10px 50px rgba(0,0,0,0.7); max-height: 85vh; overflow-y: auto; border-top: 1px solid #333; }
+        .bottom-sheet.active { transform: translateY(0); }
+        .sheet-handle { width: 50px; height: 6px; background: #444; border-radius: 10px; margin: 0 auto 25px auto; }
+        .sheet-category { color: var(--accent-purple); font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
+        .sheet-title { font-size: 24px; font-weight: 800; line-height: 1.3; margin-bottom: 30px; color: #fff; }
+        .btn-main { display: block; width: 100%; text-align: center; background: var(--accent-sunray); color: #000; font-weight: 800; font-size: 17px; text-transform: uppercase; padding: 18px; border-radius: 16px; border: none; margin-bottom: 35px; cursor: pointer; box-shadow: 0 8px 25px rgba(227, 188, 87, 0.4); transition: transform 0.1s; }
+        .btn-main:active { transform: scale(0.97); }
+        .related-section { border-top: 1px solid #333; padding-top: 25px; }
+        .related-header { font-size: 14px; color: #888; margin-bottom: 18px; font-weight: 700; text-transform: uppercase; }
+        .related-item { background: #2a2a2a; padding: 14px 18px; border-radius: 12px; margin-bottom: 12px; font-size: 14px; color: #ddd; display: flex; align-items: center; justify-content: space-between; border: 1px solid #3a3a3a; font-weight: 600; }
+        .related-item:active { background: #333; border-color: #555; }
+        .related-arrow { color: var(--accent-purple); font-weight: bold; }
+        .upsell-btn { background: linear-gradient(135deg, rgba(157, 0, 255, 0.15), rgba(157, 0, 255, 0.05)); border: 1px solid var(--accent-purple); color: #cba3ff; padding: 16px; border-radius: 16px; text-align: center; font-size: 15px; font-weight: 700; margin-top: 25px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 15px rgba(157, 0, 255, 0.1); }
+        
+        .empty-state { text-align: center; color: #666; margin-top: 80px; font-size: 15px; font-weight: 500; }
     </style>
 </head>
 <body>
 
-    <div class="header-container glide-entry" style="animation-delay: 0.1s;">
-        <input type="text" id="searchInput" class="search-box" placeholder="Поиск по базе знаний...">
+    <div class="header-container" id="listHeader">
+        <div class="header-top-row">
+            <div class="back-btn" id="backToHomeBtn">← Назад</div>
+            <input type="text" id="searchInput" class="search-box" placeholder="Поиск по базе...">
+        </div>
         <div class="tags-wrapper" id="tagsContainer"></div>
     </div>
 
-    <div class="inquisition-card glide-entry" id="inqBtn" style="animation-delay: 0.2s;">
-        <div class="inq-title">🩸 Дары Святой Инквизиции</div>
-        <div class="inq-desc">Закрытый канал. Доступ только через бота. Жми, если готов.</div>
-        <div class="inq-bg-icon">⚖️</div>
-    </div>
+    <div class="main-content">
+        
+        <div class="inquisition-card glide-entry" id="inqBtn" style="animation-delay: 0.1s;">
+            <div class="inq-text">
+                <div class="inq-title">Дары Святой Инквизиции</div>
+                <div class="inq-desc">Закрытый канал. Доступ через бота.</div>
+            </div>
+            <img src="https://github.com/matveenko/matveenko.github.io/blob/main/image_2025-10-14_14-43-57.png" alt="Manticore" class="inq-icon-img">
+        </div>
 
-    <div class="posts-list" id="postsContainer"></div>
+        <div id="homeTilesContainer">
+            </div>
+
+        <div id="listViewContainer">
+             <div class="posts-list" id="postsContainer"></div>
+        </div>
+
+    </div>
 
     <div class="modal-overlay" id="modalOverlay"></div>
     <div class="bottom-sheet" id="postSheet">
@@ -181,7 +211,7 @@
         <button class="btn-main" id="readBtn">ЧИТАТЬ СТАТЬЮ 🔥</button>
         
         <div class="related-section">
-            <div class="related-header">ТАКЖЕ ЗАЙДЕТ:</div>
+            <div class="related-header">Ещё по этой теме:</div>
             <div id="relatedContainer"></div>
         </div>
 
@@ -192,16 +222,15 @@
         const tg = window.Telegram.WebApp;
         tg.ready();
         tg.expand();
-        tg.setHeaderColor('#272727');
-        tg.setBackgroundColor('#272727');
-
-        // === НАСТРОЙКИ ===
-        const STATE_KEY = 'mentalMeridianState';
-        const STATE_TTL = 10 * 60 * 1000; 
+        tg.setHeaderColor('#1a1a1a'); // Цвет хедера под фон
+        tg.setBackgroundColor('#1a1a1a');
 
         // === БАЗА ДАННЫХ ===
+        // t: Заголовок, u: Ссылка, c: Категория
+        // Я добавил иконки (i) для плиток. Можешь менять их на свои.
         const db = [
-             { t: "Кто я такой? (История Андрэ)", u: "https://t.me/masonsmansion/61", c: "⚔️ Жизнестойкость" },
+            // ЖИЗНЕСТОЙКОСТЬ (Иконка ⚔️)
+            { t: "Кто я такой? (История Андрэ)", u: "https://t.me/masonsmansion/61", c: "⚔️ Жизнестойкость" },
             { t: "Добро пожаловать в MENTAL MERIDIAN", u: "https://t.me/masonsmansion/12", c: "⚔️ Жизнестойкость" },
             { t: "Новичкам канала посвящается", u: "https://t.me/masonsmansion/34", c: "⚔️ Жизнестойкость" },
             { t: "Твое эго мешает тебе достичь целей", u: "https://t.me/masonsmansion/129", c: "⚔️ Жизнестойкость" },
@@ -240,6 +269,7 @@
             { t: "Хватит дрочить на мотивацию", u: "https://t.me/masonsmansion/565", c: "⚔️ Жизнестойкость" },
             { t: "Тиндер сделал из тебя товар", u: "https://t.me/masonsmansion/567", c: "⚔️ Жизнестойкость" },
             { t: "Гражданская война в твоей спальне", u: "https://t.me/masonsmansion/580", c: "⚔️ Жизнестойкость" },
+            // ОШИБКИ МЫШЛЕНИЯ (Иконка 🧠)
             { t: "Фундаментальная ошибка атрибуции", u: "https://t.me/masonsmansion/84", c: "🧠 Ошибки мышления" },
             { t: "Стереотипизация", u: "https://t.me/masonsmansion/102", c: "🧠 Ошибки мышления" },
             { t: "Эффект моральной непогрешимости", u: "https://t.me/masonsmansion/110", c: "🧠 Ошибки мышления" },
@@ -259,6 +289,7 @@
             { t: "Эффект Барнума (гороскопы)", u: "https://t.me/masonsmansion/408", c: "🧠 Ошибки мышления" },
             { t: "Желание послать всё нахуй — не сила", u: "https://t.me/masonsmansion/409", c: "🧠 Ошибки мышления" },
             { t: "Желание всё упростить — признак слабоумия", u: "https://t.me/masonsmansion/416", c: "🧠 Ошибки мышления" },
+            // ЖЕНЩИНЫ (Иконка 💃)
             { t: "Как перебороть страх отказа", u: "https://t.me/masonsmansion/16", c: "💃 Женщины" },
             { t: "Первое впечатление при знакомстве", u: "https://t.me/masonsmansion/22", c: "💃 Женщины" },
             { t: "Деньги не решают, любовь не купишь", u: "https://t.me/masonsmansion/33", c: "💃 Женщины" },
@@ -285,6 +316,7 @@
             { t: "Меркантильные женщины: оправдание", u: "https://t.me/masonsmansion/559", c: "💃 Женщины" },
             { t: "Женская любовь: биохимия процесса", u: "https://t.me/masonsmansion/562", c: "💃 Женщины" },
             { t: "Самовлюбление в чучело", u: "https://t.me/masonsmansion/574", c: "💃 Женщины" },
+            // ЗДОРОВЬЕ (Иконка 💊)
             { t: "Партнеры Masons' Mansion (врачи)", u: "https://t.me/masonsmansion/58", c: "💊 Здоровье" },
             { t: "Ыыы я стану умным (таблетки)", u: "https://t.me/masonsmansion/333", c: "💊 Здоровье" },
             { t: "Гои дуреют с этой прикормки (БАДы)", u: "https://t.me/masonsmansion/341", c: "💊 Здоровье" },
@@ -294,6 +326,7 @@
             { t: "Ты спишь как лох (чудо-подушки)", u: "https://t.me/masonsmansion/561", c: "💊 Здоровье" },
             { t: "Зимняя апатия: гайд по борьбе с хандрой", u: "https://t.me/masonsmansion/568", c: "💊 Здоровье" },
             { t: "Боунсмешинг: смертельно опасный тренд", u: "https://t.me/masonsmansion/577", c: "💊 Здоровье" },
+            // МЕДИА (Иконка 🎙)
             { t: "Подкаст #1: Дорогой, я хочу тебя", u: "https://t.me/masonsmansion/286", c: "🎙 Медиа" },
             { t: "Подкаст #2: Как сдохнуть в 25 лет?", u: "https://t.me/masonsmansion/311", c: "🎙 Медиа" },
             { t: "Подкаст #3: Стиль — это всё", u: "https://t.me/masonsmansion/403", c: "🎙 Медиа" },
@@ -306,11 +339,13 @@
             { t: "Эфир про расставание (Видео)", u: "https://t.me/masonsmansion/519", c: "🎙 Медиа" },
             { t: "Подкаст о Темной Триаде", u: "https://t.me/masonsmansion/564", c: "🎙 Медиа" },
             { t: "Подкаст про женские проверки", u: "https://t.me/masonsmansion/434", c: "🎙 Медиа" },
+            // ФОЛЬКЛОР (Иконка 📜)
             { t: "Сказка о Степашке. Часть 1", u: "https://t.me/masonsmansion/174", c: "📜 Фольклор" },
             { t: "Сказка о Степашке. Часть 2", u: "https://t.me/masonsmansion/194", c: "📜 Фольклор" },
             { t: "Сказка о Степашке. Часть 3", u: "https://t.me/masonsmansion/203", c: "📜 Фольклор" },
             { t: "Сказка о Степашке. Финал", u: "https://t.me/masonsmansion/210", c: "📜 Фольклор" },
             { t: "Книга «Уроборос» (Киберпанк)", u: "https://t.me/masonsmansion/505", c: "📜 Фольклор" },
+            // ИНКВИЗИЦИЯ (Иконка 🔒)
             { t: "Гайд на сайты знакомств (Файл)", u: "https://t.me/masonsmansion/309", c: "🔒 Гайды/Отчеты" },
             { t: "Отчет Инквизиции #1 (Весна 2025)", u: "https://t.me/masonsmansion/392", c: "🔒 Гайды/Отчеты" },
             { t: "Отчет Инквизиции #2 (Март-Апрель 2025)", u: "https://t.me/masonsmansion/428", c: "🔒 Гайды/Отчеты" },
@@ -319,17 +354,160 @@
             { t: "Зачем мы предлагаем тебе Инквизицию?", u: "https://t.me/masonsmansion/521", c: "🔒 Гайды/Отчеты" },
         ];
 
-        const uniqueCategories = [...new Set(db.map(item => item.c))];
-        const categories = ["Все", ...uniqueCategories];
+        // Собираем уникальные категории и их иконки
+        const categoriesMap = new Map();
+        db.forEach(item => {
+            const parts = item.c.split(' ');
+            const icon = parts[0];
+            const name = parts.slice(1).join(' ');
+            if (!categoriesMap.has(item.c)) {
+                categoriesMap.set(item.c, { icon, name, full: item.c, count: 0 });
+            }
+            categoriesMap.get(item.c).count++;
+        });
+
+        const uniqueCategoriesList = Array.from(categoriesMap.values());
         
-        let currentCategory = "Все";
+        // Состояние приложения
+        let currentViewState = 'home'; // 'home' or 'list'
+        let currentCategory = null;
         let searchQuery = "";
 
-        const tagsContainer = document.getElementById('tagsContainer');
+        // Элементы DOM
+        const listHeader = document.getElementById('listHeader');
+        const backToHomeBtn = document.getElementById('backToHomeBtn');
+        const homeTilesContainer = document.getElementById('homeTilesContainer');
+        const listViewContainer = document.getElementById('listViewContainer');
         const postsContainer = document.getElementById('postsContainer');
         const searchInput = document.getElementById('searchInput');
+        const tagsContainer = document.getElementById('tagsContainer');
+        const mainContent = document.querySelector('.main-content');
 
-        // ELEMENTS FOR SHEET
+        // --- ФУНКЦИИ ПЕРЕКЛЮЧЕНИЯ ВИДА ---
+
+        function switchToHome() {
+            currentViewState = 'home';
+            currentCategory = null;
+            searchQuery = "";
+            searchInput.value = "";
+            
+            listHeader.style.display = 'none';
+            listViewContainer.style.display = 'none';
+            homeTilesContainer.style.display = 'grid';
+            mainContent.style.paddingTop = '20px'; // Возвращаем отступ
+            window.scrollTo({ top: 0 });
+            tg.HapticFeedback.impactOccurred('light');
+        }
+
+        function switchToList(category) {
+            currentViewState = 'list';
+            currentCategory = category;
+            
+            homeTilesContainer.style.display = 'none';
+            listHeader.style.display = 'block';
+            listViewContainer.style.display = 'block';
+            // Компенсируем высоту хедера
+            mainContent.style.paddingTop = (listHeader.offsetHeight + 20) + 'px';
+            
+            renderTags();
+            filterAndRenderList(true);
+            window.scrollTo({ top: 0 });
+        }
+
+        backToHomeBtn.addEventListener('click', switchToHome);
+
+        // --- РЕНДЕР ПЛИТОК НА ГЛАВНОЙ ---
+        function renderHomeTiles() {
+            homeTilesContainer.innerHTML = '';
+            let animDelay = 0.2;
+            uniqueCategoriesList.forEach(catData => {
+                const tile = document.createElement('div');
+                tile.className = 'category-tile glide-entry';
+                tile.style.animationDelay = `${animDelay}s`;
+                tile.innerHTML = `
+                    <div class="tile-icon">${catData.icon}</div>
+                    <div>
+                        <div class="tile-title">${catData.name}</div>
+                        <div class="tile-count">${catData.count} материалов</div>
+                    </div>
+                `;
+                tile.onclick = () => {
+                    tg.HapticFeedback.impactOccurred('medium');
+                    switchToList(catData.full);
+                };
+                homeTilesContainer.appendChild(tile);
+                animDelay += 0.05;
+            });
+        }
+
+        // --- РЕНДЕР СПИСКА (СТАРАЯ ЛОГИКА) ---
+        function renderTags() {
+            tagsContainer.innerHTML = '';
+            // Кнопка "Все" в режиме списка возвращает на главную
+            const homeTag = document.createElement('div');
+            homeTag.className = 'tag';
+            homeTag.innerText = '← На Главную';
+            homeTag.onclick = switchToHome;
+            tagsContainer.appendChild(homeTag);
+
+            uniqueCategoriesList.forEach(catData => {
+                const btn = document.createElement('div');
+                btn.className = `tag ${catData.full === currentCategory ? 'active' : ''}`;
+                btn.innerText = catData.name;
+                btn.onclick = () => {
+                    currentCategory = catData.full;
+                    renderTags();
+                    filterAndRenderList(true);
+                    tg.HapticFeedback.impactOccurred('light');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                };
+                tagsContainer.appendChild(btn);
+            });
+        }
+
+        function filterAndRenderList(animate = true) {
+            postsContainer.innerHTML = '';
+            let animationIndex = 0;
+            
+            let filtered = db.filter(item => {
+                // Фильтр по категории И по поиску
+                const catMatch = item.c === currentCategory;
+                const searchMatch = item.t.toLowerCase().includes(searchQuery.toLowerCase());
+                return catMatch && searchMatch;
+            });
+
+            if (filtered.length === 0) {
+                postsContainer.innerHTML = '<div class="empty-state glide-entry" style="animation-delay: 0.1s">В этой рубрике по твоему запросу ничего нет.</div>';
+                return;
+            }
+
+            // Заголовок рубрики
+            const header = document.createElement('div');
+            header.className = animate ? 'section-header glide-entry' : 'section-header';
+            if(animate) header.style.animationDelay = '0.1s';
+            header.innerText = currentCategory;
+            postsContainer.appendChild(header);
+            animationIndex++;
+
+            // Список постов
+            filtered.forEach(item => {
+                const div = document.createElement('div');
+                div.className = animate ? 'post-card glide-entry' : 'post-card';
+                if (animate) { div.style.animationDelay = `${0.1 + (animationIndex * 0.05)}s`; }
+                
+                div.innerHTML = `<div class="post-title">${item.t}</div>`;
+                div.onclick = () => { openSheet(item); };
+                postsContainer.appendChild(div);
+                animationIndex++;
+            });
+        }
+
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            filterAndRenderList(true);
+        });
+
+        // --- ШТОРКА (BOTTOM SHEET) ---
         const modalOverlay = document.getElementById('modalOverlay');
         const postSheet = document.getElementById('postSheet');
         const sheetTitle = document.getElementById('sheetTitle');
@@ -338,181 +516,48 @@
         const relatedContainer = document.getElementById('relatedContainer');
         const upsellBtn = document.getElementById('upsellBtn');
 
-        // --- STATE MANAGEMENT ---
-        function saveState() {
-            const state = {
-                lastScrollPosition: window.scrollY,
-                searchQuery: searchInput.value,
-                activeFilter: currentCategory,
-                timestamp: Date.now()
-            };
-            localStorage.setItem(STATE_KEY, JSON.stringify(state));
-        }
-
-        function restoreState() {
-            const raw = localStorage.getItem(STATE_KEY);
-            if (!raw) return;
-            const state = JSON.parse(raw);
-            const now = Date.now();
-            if (now - state.timestamp > STATE_TTL) { localStorage.removeItem(STATE_KEY); return; }
-
-            currentCategory = state.activeFilter;
-            searchQuery = state.searchQuery || "";
-            searchInput.value = searchQuery;
-            renderCategories();
-            filterAndRender(false);
-            setTimeout(() => { window.scrollTo(0, state.lastScrollPosition); }, 50);
-        }
-
-        // --- SHEET LOGIC ---
         function openSheet(item) {
             tg.HapticFeedback.impactOccurred('medium');
-            
-            // Наполняем шторку контентом
             sheetTitle.innerText = item.t;
-            sheetCategory.innerText = item.c;
+            // Добавляем иконку к категории в шторке
+            const catIcon = item.c.split(' ')[0];
+            sheetCategory.innerHTML = `<span style="font-size: 18px;">${catIcon}</span> ${item.c.substring(catIcon.length)}`;
             
-            // Кнопка Читать
             readBtn.onclick = () => {
                 tg.HapticFeedback.impactOccurred('light');
-                saveState(); // Сохраняем перед уходом
                 tg.openTelegramLink(item.u);
             };
-
-            // Кнопка Upsell (бот)
             upsellBtn.onclick = () => {
                 tg.HapticFeedback.impactOccurred('light');
-                saveState();
                 tg.openTelegramLink('https://t.me/GiftsHolyInquisition_bot');
             }
 
-            // Рендерим похожие посты (2-3 штуки той же категории, исключая текущий)
-            const related = db
-                .filter(p => p.c === item.c && p.u !== item.u) // Та же рубрика, не этот пост
-                .sort(() => 0.5 - Math.random()) // Перемешать
-                .slice(0, 3); // Взять 3
-
+            const related = db.filter(p => p.c === item.c && p.u !== item.u).sort(() => 0.5 - Math.random()).slice(0, 3);
             relatedContainer.innerHTML = '';
-            if (related.length === 0) {
-                relatedContainer.innerHTML = '<div style="color:#666; font-size:13px;">Нет похожих материалов</div>';
-            } else {
+            if (related.length === 0) relatedContainer.innerHTML = '<div style="color:#666; font-size:13px;">Нет похожих материалов</div>';
+            else {
                 related.forEach(rel => {
                     const div = document.createElement('div');
                     div.className = 'related-item';
                     div.innerHTML = `<span>${rel.t}</span> <span class="related-arrow">→</span>`;
-                    div.onclick = () => {
-                        // При клике на похожий - обновляем шторку этим постом
-                        openSheet(rel);
-                    };
+                    div.onclick = () => { openSheet(rel); };
                     relatedContainer.appendChild(div);
                 });
             }
-
-            // Показываем
             modalOverlay.classList.add('active');
             postSheet.classList.add('active');
         }
-
-        function closeSheet() {
-            modalOverlay.classList.remove('active');
-            postSheet.classList.remove('active');
-        }
-
-        // Закрытие по клику на фон
+        function closeSheet() { modalOverlay.classList.remove('active'); postSheet.classList.remove('active'); }
         modalOverlay.addEventListener('click', closeSheet);
 
-        // --- RENDER LOGIC ---
+        // --- ИНКВИЗИЦИЯ ---
         document.getElementById('inqBtn').addEventListener('click', () => {
-            saveState();
             tg.HapticFeedback.impactOccurred('heavy');
             tg.openTelegramLink('https://t.me/GiftsHolyInquisition_bot');
         });
 
-        function renderCategories() {
-            tagsContainer.innerHTML = '';
-            categories.forEach(cat => {
-                const btn = document.createElement('div');
-                btn.className = `tag ${cat === currentCategory ? 'active' : ''}`;
-                btn.innerText = cat;
-                btn.onclick = () => {
-                    currentCategory = cat;
-                    renderCategories();
-                    filterAndRender(true);
-                    tg.HapticFeedback.impactOccurred('light');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                };
-                tagsContainer.appendChild(btn);
-            });
-        }
-
-        function createPostElement(item, index, animate = true) {
-            const div = document.createElement('div');
-            div.className = animate ? 'post-card glide-entry' : 'post-card';
-            if (animate) { div.style.animationDelay = `${0.3 + (index * 0.05)}s`; }
-            
-            div.innerHTML = `<div class="post-title">${item.t}</div>`;
-            div.onclick = () => {
-                // ВМЕСТО ПЕРЕХОДА СРАЗУ ОТКРЫВАЕМ ШТОРКУ
-                openSheet(item);
-            };
-            return div;
-        }
-
-        function createSectionHeader(title, index, animate = true) {
-            const div = document.createElement('div');
-            div.className = animate ? 'section-header glide-entry' : 'section-header';
-            if (animate) { div.style.animationDelay = `${0.3 + (index * 0.05)}s`; }
-            div.innerText = title;
-            return div;
-        }
-
-        function filterAndRender(animate = true) {
-            postsContainer.innerHTML = '';
-            let animationIndex = 0;
-            let filtered = db.filter(item => item.t.toLowerCase().includes(searchQuery.toLowerCase()));
-
-            if (filtered.length === 0) {
-                postsContainer.innerHTML = '<div class="empty-state">По твоему запросу нихуя не найдено.</div>';
-                return;
-            }
-
-            if (currentCategory === "Все") {
-                let hasAnyPost = false;
-                uniqueCategories.forEach(cat => {
-                    const catPosts = filtered.filter(item => item.c === cat);
-                    if (catPosts.length > 0) {
-                        hasAnyPost = true;
-                        postsContainer.appendChild(createSectionHeader(cat, animationIndex++, animate));
-                        catPosts.forEach(post => {
-                            postsContainer.appendChild(createPostElement(post, animationIndex++, animate));
-                        });
-                    }
-                });
-                if (!hasAnyPost) postsContainer.innerHTML = '<div class="empty-state">Пусто, блять.</div>';
-            } else {
-                const catPosts = filtered.filter(item => item.c === currentCategory);
-                if (catPosts.length === 0) {
-                     postsContainer.innerHTML = '<div class="empty-state">В этой рубрике пусто.</div>';
-                     return;
-                }
-                catPosts.forEach(post => {
-                    postsContainer.appendChild(createPostElement(post, animationIndex++, animate));
-                });
-            }
-        }
-
-        searchInput.addEventListener('input', (e) => {
-            searchQuery = e.target.value;
-            filterAndRender(true);
-        });
-
-        renderCategories();
-        
-        if (localStorage.getItem(STATE_KEY)) {
-            restoreState();
-        } else {
-            filterAndRender(true);
-        }
+        // --- ИНИЦИАЛИЗАЦИЯ ---
+        renderHomeTiles();
 
     </script>
 </body>
