@@ -7,7 +7,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         :root {
-            /* --- PALETTE --- */
             --bg-body: #1a1a1a;
             --bg-card: #2d2d2d;
             --text-main: #FFFFFF;
@@ -74,7 +73,117 @@
         /* --- CONTENT --- */
         .main-content { padding: 80px 15px 80px 15px; transition: padding-top 0.3s ease; }
 
-        /* --- CARDS --- */
+        /* --- PROGRESS CARD (RANKS) --- */
+        .progress-card {
+            background: linear-gradient(145deg, #2a2a2a, #222222);
+            border-radius: var(--radius); padding: 20px;
+            margin-bottom: 20px; border: 1px solid #333;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            position: relative; overflow: hidden;
+        }
+        .progress-card.ascended {
+            background: linear-gradient(135deg, #10002b, #240046);
+            border: 1px solid #00d4ff;
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+        }
+        .progress-card.ascended::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
+            animation: shimmer 1.5s infinite; pointer-events: none;
+        }
+
+        .rank-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
+        .rank-title { font-size: 12px; color: #888; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+        .rank-name { font-size: 18px; font-weight: 900; color: var(--text-main); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+        
+        .rank-name.gold { color: var(--accent-sunray); text-shadow: 0 0 10px rgba(227, 188, 87, 0.4); }
+        .rank-name.ascended-text {
+            background: linear-gradient(90deg, #E3BC57, #9D00FF, #00d4ff);
+            background-size: 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: gradientMove 3s linear infinite; font-size: 20px; letter-spacing: 1px;
+        }
+        @keyframes gradientMove { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }
+
+        .progress-stats { font-size: 12px; color: var(--accent-purple); font-weight: 600; }
+        .progress-bar-bg { width: 100%; height: 8px; background: #333; border-radius: 4px; overflow: hidden; position: relative; margin-bottom: 15px; }
+        .progress-bar-fill { height: 100%; background: var(--accent-sunray); width: 0%; border-radius: 4px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px rgba(227, 188, 87, 0.5); }
+
+        /* ACHIVEMENTS ROW */
+        .achievements-row {
+            display: flex; gap: 8px; justify-content: space-between;
+            padding-top: 15px; border-top: 1px solid #3d3d3d;
+            overflow-x: auto; scrollbar-width: none;
+        }
+        .badge {
+            width: 40px; height: 40px; min-width: 40px; border-radius: 50%;
+            background: #252525; border: 1px solid #444;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: #666; filter: grayscale(1); opacity: 0.4;
+            transition: all 0.3s; cursor: pointer;
+        }
+        .badge.unlocked {
+            filter: grayscale(0); opacity: 1;
+            background: #2d2d2d;
+            color: #fff;
+        }
+        .badge:active { transform: scale(0.9); }
+
+        .badge.secret { border: 1px dashed #555; color: #555; font-size: 14px; }
+        .badge.secret.unlocked {
+            border: 1px solid #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0% { box-shadow: 0 0 10px rgba(0, 212, 255, 0.3); } 50% { box-shadow: 0 0 25px rgba(0, 212, 255, 0.7); } 100% { box-shadow: 0 0 10px rgba(0, 212, 255, 0.3); } }
+
+        /* --- TOAST (Всплывашка) --- */
+        .toast {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(20px);
+            background: rgba(20, 20, 20, 0.95); border: 1px solid var(--accent-purple);
+            color: #fff; padding: 12px 20px; border-radius: 30px;
+            font-size: 14px; font-weight: 600; z-index: 3000;
+            opacity: 0; visibility: hidden; transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5); text-align: center;
+            white-space: nowrap;
+        }
+        .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+        /* --- MODAL CELEBRATION (Большая карточка) --- */
+        .celebration-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(8px);
+            z-index: 2000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; visibility: hidden; transition: all 0.4s;
+        }
+        .celebration-modal.active { opacity: 1; visibility: visible; }
+        
+        .celebration-card {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            border: 2px solid var(--accent-sunray);
+            border-radius: 24px; padding: 30px 20px;
+            width: 85%; max-width: 350px; text-align: center;
+            transform: scale(0.8); transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 50px rgba(227, 188, 87, 0.2);
+        }
+        .celebration-modal.active .celebration-card { transform: scale(1); }
+        
+        .cel-icon { font-size: 60px; margin-bottom: 20px; filter: drop-shadow(0 0 20px var(--accent-sunray)); }
+        .cel-title { color: #888; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; margin-bottom: 10px; }
+        .cel-name { 
+            color: #fff; font-size: 24px; font-weight: 900; text-transform: uppercase; 
+            margin-bottom: 15px; line-height: 1.2;
+        }
+        .cel-msg { color: #ccc; font-size: 14px; margin-bottom: 30px; line-height: 1.4; font-style: italic; }
+        .cel-btn {
+            background: var(--accent-sunray); color: #000;
+            border: none; padding: 16px 30px; border-radius: 16px;
+            font-weight: 900; font-size: 16px; text-transform: uppercase;
+            width: 100%; cursor: pointer; box-shadow: 0 5px 20px rgba(227, 188, 87, 0.4);
+        }
+        .cel-btn:active { transform: scale(0.97); }
+
+        /* --- SPECIAL CARDS --- */
         .special-card {
             margin-bottom: 20px; border-radius: var(--radius); padding: 25px 20px;
             cursor: pointer; position: relative; overflow: hidden;
@@ -87,13 +196,12 @@
 
         .card-red { background: linear-gradient(135deg, #420000 0%, #1a0000 100%); border: 1px solid var(--danger-red); border-left: 6px solid var(--danger-red); }
         .card-gold { background: linear-gradient(135deg, #3a2e00 0%, #1a1a1a 100%); border: 1px solid var(--accent-sunray); border-left: 6px solid var(--accent-sunray); }
-        .card-purple { background: linear-gradient(135deg, #2a003a 0%, #1a1a1a 100%); border: 1px solid var(--accent-purple); border-left: 6px solid var(--accent-purple); display: none; /* Скрыта, пока нет избранного */ }
+        .card-purple { background: linear-gradient(135deg, #2a003a 0%, #1a1a1a 100%); border: 1px solid var(--accent-purple); border-left: 6px solid var(--accent-purple); display: none; }
 
         .sp-title { font-weight: 900; font-size: 19px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; z-index: 2; }
         .red-text { color: #ff4d4d; text-shadow: 0 2px 10px rgba(207, 10, 10, 0.5); }
         .gold-text { color: var(--accent-sunray); text-shadow: 0 2px 10px rgba(227, 188, 87, 0.4); }
         .purple-text { color: var(--accent-purple); text-shadow: 0 2px 10px rgba(157, 0, 255, 0.4); }
-        
         .sp-desc { color: #ddd; font-size: 13px; line-height: 1.3; z-index: 2; opacity: 0.9; font-weight: 500; }
         .sp-bg-icon { position: absolute; right: -10px; bottom: -15px; font-size: 80px; opacity: 0.1; transform: rotate(-20deg); filter: grayscale(100%); z-index: 0; pointer-events: none; }
 
@@ -118,18 +226,13 @@
         .section-header { margin-top: 25px; margin-bottom: 15px; display: flex; align-items: center; color: var(--accent-sunray); font-weight: 800; font-size: 14px; text-transform: uppercase; letter-spacing: 1.2px; }
         .section-header::before { content: ''; display: inline-block; width: 4px; height: 18px; background: var(--accent-purple); margin-right: 12px; border-radius: 4px; box-shadow: 0 0 10px var(--accent-purple); }
         .posts-list { display: flex; flex-direction: column; gap: 12px; }
-        
         .post-card { background-color: var(--card-bg); padding: 18px; border-radius: var(--radius); cursor: pointer; position: relative; overflow: hidden; border: 1px solid #3a3a3a; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         .post-card:active { background-color: #383838; border-color: var(--accent-sunray); }
         .post-title { font-size: 15px; line-height: 1.5; font-weight: 600; color: #e0e0e0; display: flex; justify-content: space-between; align-items: flex-start; }
-        
-        /* Стили для прочитанного и закрытого */
         .is-read { opacity: 0.5; }
         .read-icon { color: var(--accent-purple); font-weight: bold; margin-left: 10px; font-size: 14px; }
-        
         .post-locked { border-left: 3px solid var(--danger-red); background: rgba(207, 10, 10, 0.05); }
         .lock-icon { color: var(--danger-red); margin-left: 10px; }
-
         .highlight { background: var(--highlight-bg); color: #fff; padding: 0 2px; border-radius: 4px; }
 
         /* --- BOTTOM SHEET --- */
@@ -143,11 +246,11 @@
         .sheet-title { font-size: 24px; font-weight: 800; line-height: 1.3; margin-bottom: 30px; color: #fff; }
         .sheet-actions { display: flex; gap: 10px; margin-bottom: 30px; }
         
-        /* КНОПКИ В ШТОРКЕ */
-        .btn-main { flex: 3; text-align: center; background: var(--accent-sunray); color: #000; font-weight: 900; font-size: 16px; text-transform: uppercase; padding: 16px; border-radius: 14px; border: none; cursor: pointer; box-shadow: 0 5px 20px rgba(227, 188, 87, 0.3); transition: transform 0.1s; }
+        /* КНОПКИ В ШТОРКЕ (ФИКС) */
+        .btn-main { flex: 1; text-align: center; background: var(--accent-sunray); color: #000; font-weight: 900; font-size: 16px; text-transform: uppercase; padding: 16px; border-radius: 14px; border: none; cursor: pointer; box-shadow: 0 5px 20px rgba(227, 188, 87, 0.3); transition: transform 0.1s; }
         .btn-main:active { transform: scale(0.97); }
         
-        .btn-icon { flex: 1; display: flex; align-items: center; justify-content: center; background: rgba(157, 0, 255, 0.15); color: var(--accent-purple); border: 1px solid var(--accent-purple); border-radius: 14px; font-weight: 700; font-size: 20px; cursor: pointer; transition: background 0.1s; backdrop-filter: blur(5px); }
+        .btn-icon { flex: 0 0 52px; height: 52px; display: flex; align-items: center; justify-content: center; background: rgba(157, 0, 255, 0.15); color: var(--accent-purple); border: 1px solid var(--accent-purple); border-radius: 14px; font-weight: 700; font-size: 20px; cursor: pointer; transition: background 0.1s; backdrop-filter: blur(5px); }
         .btn-icon:active { background: rgba(157, 0, 255, 0.3); }
         .btn-icon.active { background: var(--accent-purple); color: #fff; box-shadow: 0 0 15px var(--accent-purple); }
 
@@ -161,22 +264,15 @@
         .upsell-btn:active { border-color: var(--accent-purple); color: var(--accent-purple); background: rgba(157, 0, 255, 0.05); }
         
         .empty-state { text-align: center; color: #666; margin-top: 60px; font-size: 15px; font-weight: 500; }
-        
         .btn-inq-action { margin-top: 20px; font-size: 14px; padding: 14px 24px; width: auto; display: inline-block; background: linear-gradient(135deg, var(--danger-red), var(--danger-dark)); color: #FFFFFF !important; font-weight: 800; text-transform: uppercase; border-radius: 12px; border: none; box-shadow: 0 5px 20px rgba(207, 10, 10, 0.4); transition: transform 0.1s; letter-spacing: 0.5px; }
         .btn-inq-action:active { transform: scale(0.97); box-shadow: 0 2px 10px rgba(207, 10, 10, 0.3); }
 
-        /* --- RANDOM FAB (DICE) --- */
         .fab-dice {
-            position: fixed; bottom: 30px; right: 20px;
-            width: 56px; height: 56px;
-            background: var(--accent-purple);
-            border-radius: 50%;
+            position: fixed; bottom: 30px; right: 20px; width: 56px; height: 56px;
+            background: var(--accent-purple); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-size: 28px;
-            box-shadow: 0 5px 20px rgba(157, 0, 255, 0.5);
-            z-index: 90;
-            cursor: pointer;
-            transition: transform 0.2s;
+            font-size: 28px; box-shadow: 0 5px 20px rgba(157, 0, 255, 0.5);
+            z-index: 90; cursor: pointer; transition: transform 0.2s;
             border: 2px solid rgba(255,255,255,0.2);
         }
         .fab-dice:active { transform: scale(0.9) rotate(20deg); }
@@ -195,6 +291,20 @@
     <div class="main-content" id="mainContent">
         
         <div id="homeWrapper">
+            <div class="progress-card glide-entry" id="progressCard" style="animation-delay: 0.02s;">
+                <div class="rank-header">
+                    <div>
+                        <div class="rank-title">Твой статус:</div>
+                        <div class="rank-name" id="rankName">👁 НАБЛЮДАТЕЛЬ</div>
+                    </div>
+                    <div class="progress-stats" id="progressStats">0%</div>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressBar"></div>
+                </div>
+                <div class="achievements-row" id="achievementsRow"></div>
+            </div>
+
             <div class="special-card card-red glide-entry" id="inqBtn" style="animation-delay: 0.05s;">
                 <div class="sp-title red-text">🩸 Дары Святой Инквизиции</div>
                 <div class="sp-desc">Закрытый канал. Доступ только через бота. Жми, если готов.</div>
@@ -223,6 +333,18 @@
     </div>
 
     <div class="fab-dice" id="randomBtn">🎲</div>
+    
+    <div id="celebrationModal" class="celebration-modal">
+        <div class="celebration-card">
+            <div class="cel-icon" id="celIcon">🏆</div>
+            <div class="cel-title">ДОСТИЖЕНИЕ РАЗБЛОКИРОВАНО</div>
+            <div class="cel-name" id="celName">ИМЯ АЧИВКИ</div>
+            <div class="cel-msg" id="celMsg">Описание</div>
+            <button class="cel-btn" onclick="closeCelModal()">ЗАЕБИСЬ</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">Инфо</div>
 
     <div class="modal-overlay" id="modalOverlay"></div>
     <div class="bottom-sheet" id="postSheet">
@@ -244,6 +366,9 @@
         </div>
         <button class="upsell-btn" id="upsellBtn">🎁 Забрать секретные материалы (Бот)</button>
     </div>
+
+    <script src="data.js"></script>
+
     <script>
         const tg = window.Telegram.WebApp;
         tg.ready();
@@ -251,154 +376,44 @@
         tg.setHeaderColor('#262626');
         tg.setBackgroundColor('#1a1a1a');
 
-        const STATE_KEY = 'mm_hub_state_v6'; 
+        const STATE_KEY = 'mm_hub_state_v9'; 
         const READ_KEY = 'mm_read_posts';
         const FAV_KEY = 'mm_favorites';
+        const NOTIFIED_KEY = 'mm_notified_achievements'; 
         const STATE_TTL = 15 * 60 * 1000; 
 
-        // БАЗА ДАННЫХ
-        const db = [
-            { t: "Кто я такой? (История Андрэ)", u: "https://t.me/masonsmansion/61", c: "⚔️ Жизнестойкость" },
-            { t: "Добро пожаловать в MENTAL MERIDIAN", u: "https://t.me/masonsmansion/12", c: "⚔️ Жизнестойкость" },
-            { t: "Новичкам канала посвящается", u: "https://t.me/masonsmansion/34", c: "⚔️ Жизнестойкость" },
-            { t: "Твое эго мешает тебе достичь целей", u: "https://t.me/masonsmansion/129", c: "⚔️ Жизнестойкость" },
-            { t: "Ты кастрирован массовой культурой (Часть 1)", u: "https://t.me/masonsmansion/136", c: "⚔️ Жизнестойкость" },
-            { t: "Массовая культура кастрирует мужчин (Часть 2)", u: "https://t.me/masonsmansion/137", c: "⚔️ Жизнестойкость" },
-            { t: "Копирование чужого стиля — путь в никуда", u: "https://t.me/masonsmansion/163", c: "⚔️ Жизнестойкость" },
-            { t: "Как правильно рисковать", u: "https://t.me/masonsmansion/202", c: "⚔️ Жизнестойкость" },
-            { t: "Самокастрация современных мужчин", u: "https://t.me/masonsmansion/209", c: "⚔️ Жизнестойкость" },
-            { t: "Анальная фиксация на родителях", u: "https://t.me/masonsmansion/213", c: "⚔️ Жизнестойкость" },
-            { t: "Скуфы: классификация и почему это дно", u: "https://t.me/masonsmansion/232", c: "⚔️ Жизнестойкость" },
-            { t: "Мужчины-самомозгоёбы (Overthinking)", u: "https://t.me/masonsmansion/233", c: "⚔️ Жизнестойкость" },
-            { t: "Необижающая психотерапия: как тебя разводят", u: "https://t.me/masonsmansion/251", c: "⚔️ Жизнестойкость" },
-            { t: "Метамодерн: мир с мудаками", u: "https://t.me/masonsmansion/272", c: "⚔️ Жизнестойкость" },
-            { t: "Посредственность: как превратить жизнь в болото", u: "https://t.me/masonsmansion/274", c: "⚔️ Жизнестойкость" },
-            { t: "Рыночные отношения в семье", u: "https://t.me/masonsmansion/303", c: "⚔️ Жизнестойкость" },
-            { t: "Зачем нужна левая повестка (DEI скам)", u: "https://t.me/masonsmansion/420", c: "⚔️ Жизнестойкость" },
-            { t: "Причина твоей прокрастинации", u: "https://t.me/masonsmansion/422", c: "⚔️ Жизнестойкость" },
-            { t: "Хули я нищий? Причины бедности", u: "https://t.me/masonsmansion/423", c: "⚔️ Жизнестойкость" },
-            { t: "Стараться делать ≠ делать, стараясь", u: "https://t.me/masonsmansion/424", c: "⚔️ Жизнестойкость" },
-            { t: "Мини-подкаст: Как достигать любой цели", u: "https://t.me/masonsmansion/425", c: "⚔️ Жизнестойкость" },
-            { t: "До 30 — или никогда (Обращение к зумерам)", u: "https://t.me/masonsmansion/433", c: "⚔️ Жизнестойкость" },
-            { t: "Показала жопу — купила квартиру (OnlyFans)", u: "https://t.me/masonsmansion/462", c: "⚔️ Жизнестойкость" },
-            { t: "Жизнь в аду: какая мысль не даст сгореть?", u: "https://t.me/masonsmansion/482", c: "⚔️ Жизнестойкость" },
-            { t: "Одиночества нет (тебя наебали)", u: "https://t.me/masonsmansion/494", c: "⚔️ Жизнестойкость" },
-            { t: "Страх — это рудимент", u: "https://t.me/masonsmansion/500", c: "⚔️ Жизнестойкость" },
-            { t: "Алекс Лесли и его адепты", u: "https://t.me/masonsmansion/501", c: "⚔️ Жизнестойкость" },
-            { t: "Гайд: как перестать быть ленивым уебком", u: "https://t.me/masonsmansion/520", c: "⚔️ Жизнестойкость" },
-            { t: "Инстаграм ломает жизнь (женская зависть)", u: "https://t.me/masonsmansion/533", c: "⚔️ Жизнестойкость" },
-            { t: "Ты справишься со всем", u: "https://t.me/masonsmansion/534", c: "⚔️ Жизнестойкость" },
-            { t: "Вечный голод (становление)", u: "https://t.me/masonsmansion/539", c: "⚔️ Жизнестойкость" },
-            { t: "Нет друзей — нет жизни (Нетворкинг)", u: "https://t.me/masonsmansion/540", c: "⚔️ Жизнестойкость" },
-            { t: "Армия альфа-школоты Маркаряна", u: "https://t.me/masonsmansion/544", c: "⚔️ Жизнестойкость" },
-            { t: "Брачный договор — фикция", u: "https://t.me/masonsmansion/547", c: "⚔️ Жизнестойкость" },
-            { t: "Сигма инцелы: культ 'одинокого волка'", u: "https://t.me/masonsmansion/548", c: "⚔️ Жизнестойкость" },
-            { t: "Разъёб «альфа»-гуру", u: "https://t.me/masonsmansion/557", c: "⚔️ Жизнестойкость" },
-            { t: "Хватит дрочить на мотивацию", u: "https://t.me/masonsmansion/565", c: "⚔️ Жизнестойкость" },
-            { t: "Тиндер сделал из тебя товар", u: "https://t.me/masonsmansion/567", c: "⚔️ Жизнестойкость" },
-            { t: "Гражданская война в твоей спальне", u: "https://t.me/masonsmansion/580", c: "⚔️ Жизнестойкость" },
-            { t: "Фундаментальная ошибка атрибуции", u: "https://t.me/masonsmansion/84", c: "🧠 Ошибки мышления" },
-            { t: "Стереотипизация", u: "https://t.me/masonsmansion/102", c: "🧠 Ошибки мышления" },
-            { t: "Эффект моральной непогрешимости", u: "https://t.me/masonsmansion/110", c: "🧠 Ошибки мышления" },
-            { t: "Отклонение в сторону нулевой суммы", u: "https://t.me/masonsmansion/162", c: "🧠 Ошибки мышления" },
-            { t: "Гало-эффект (эффект ореола)", u: "https://t.me/masonsmansion/167", c: "🧠 Ошибки мышления" },
-            { t: "Присоединение к большинству", u: "https://t.me/masonsmansion/171", c: "🧠 Ошибки мышления" },
-            { t: "Иррациональная эскалация (лудомания)", u: "https://t.me/masonsmansion/181", c: "🧠 Ошибки мышления" },
-            { t: "Ошибка выжившего", u: "https://t.me/masonsmansion/182", c: "🧠 Ошибки мышления" },
-            { t: "Самосбывающееся пророчество", u: "https://t.me/masonsmansion/197", c: "🧠 Ошибки мышления" },
-            { t: "Реактивное обесценивание", u: "https://t.me/masonsmansion/198", c: "🧠 Ошибки мышления" },
-            { t: "Переоценка воздействия", u: "https://t.me/masonsmansion/200", c: "🧠 Ошибки мышления" },
-            { t: "Ошибка техасского стрелка", u: "https://t.me/masonsmansion/225", c: "🧠 Ошибки мышления" },
-            { t: "Эффект Даннинга-Крюгера", u: "https://t.me/masonsmansion/230", c: "🧠 Ошибки мышления" },
-            { t: "Склонность к анекдотам (Anecdotal fallacy)", u: "https://t.me/masonsmansion/245", c: "🧠 Ошибки мышления" },
-            { t: "Эвристика доступности", u: "https://t.me/masonsmansion/276", c: "🧠 Ошибки мышления" },
-            { t: "Ложная дилемма", u: "https://t.me/masonsmansion/305", c: "🧠 Ошибки мышления" },
-            { t: "Эффект Барнума (гороскопы)", u: "https://t.me/masonsmansion/408", c: "🧠 Ошибки мышления" },
-            { t: "Желание послать всё нахуй — не сила", u: "https://t.me/masonsmansion/409", c: "🧠 Ошибки мышления" },
-            { t: "Желание всё упростить — признак слабоумия", u: "https://t.me/masonsmansion/416", c: "🧠 Ошибки мышления" },
-            { t: "Как перебороть страх отказа", u: "https://t.me/masonsmansion/16", c: "💃 Женщины" },
-            { t: "Первое впечатление при знакомстве", u: "https://t.me/masonsmansion/22", c: "💃 Женщины" },
-            { t: "Деньги не решают, любовь не купишь", u: "https://t.me/masonsmansion/33", c: "💃 Женщины" },
-            { t: "Почему не стоит откровенничать с женщиной", u: "https://t.me/masonsmansion/117", c: "💃 Женщины" },
-            { t: "Как стать просто другом (ошибки)", u: "https://t.me/masonsmansion/124", c: "💃 Женщины" },
-            { t: "Женская красота — это оружие", u: "https://t.me/masonsmansion/168", c: "💃 Женщины" },
-            { t: "Тактильность с девушками (гайд)", u: "https://t.me/masonsmansion/172", c: "💃 Женщины" },
-            { t: "Отсутствие отца у девушки (редфлаги)", u: "https://t.me/masonsmansion/177", c: "💃 Женщины" },
-            { t: "ПЗР (Пизда Затмила Разум)", u: "https://t.me/masonsmansion/179", c: "💃 Женщины" },
-            { t: "Ненависть к женщинам — признак слабоумия", u: "https://t.me/masonsmansion/180", c: "💃 Женщины" },
-            { t: "Девушка в беде (Lady in distress)", u: "https://t.me/masonsmansion/185", c: "💃 Женщины" },
-            { t: "Боевые куколды (Алени 80 lvl)", u: "https://t.me/masonsmansion/190", c: "💃 Женщины" },
-            { t: "Фетиш на азиаток (мифы)", u: "https://t.me/masonsmansion/205", c: "💃 Женщины" },
-            { t: "Страх расстраивать свою Алину", u: "https://t.me/masonsmansion/206", c: "💃 Женщины" },
-            { t: "Непригодные пикаперы", u: "https://t.me/masonsmansion/208", c: "💃 Женщины" },
-            { t: "Девушка выбирает между мной и бывшим", u: "https://t.me/masonsmansion/235", c: "💃 Женщины" },
-            { t: "Роскомнадзор из-за развода", u: "https://t.me/masonsmansion/236", c: "💃 Женщины" },
-            { t: "Попытка купить женщину (ошибка №1)", u: "https://t.me/masonsmansion/242", c: "💃 Женщины" },
-            { t: "Как заметить женскую измену", u: "https://t.me/masonsmansion/298", c: "💃 Женщины" },
-            { t: "Alpha Widow (она сохнет по бывшему)", u: "https://t.me/masonsmansion/498", c: "💃 Женщины" },
-            { t: "Меня ебало 80 человек (шкварка)", u: "https://t.me/masonsmansion/536", c: "💃 Женщины" },
-            { t: "Секс или дружба? Гайд, как не надо", u: "https://t.me/masonsmansion/537", c: "💃 Женщины" },
-            { t: "Мамочка тебя накажет (манипуляции)", u: "https://t.me/masonsmansion/538", c: "💃 Женщины" },
-            { t: "Меркантильные женщины: оправдание", u: "https://t.me/masonsmansion/559", c: "💃 Женщины" },
-            { t: "Женская любовь: биохимия процесса", u: "https://t.me/masonsmansion/562", c: "💃 Женщины" },
-            { t: "Самовлюбление в чучело", u: "https://t.me/masonsmansion/574", c: "💃 Женщины" },
-            { t: "Партнеры Masons' Mansion (врачи)", u: "https://t.me/masonsmansion/58", c: "💊 Здоровье" },
-            { t: "Ыыы я стану умным (таблетки)", u: "https://t.me/masonsmansion/333", c: "💊 Здоровье" },
-            { t: "Гои дуреют с этой прикормки (БАДы)", u: "https://t.me/masonsmansion/341", c: "💊 Здоровье" },
-            { t: "God Mode: твой мозг работает на 15%", u: "https://t.me/masonsmansion/375", c: "💊 Здоровье" },
-            { t: "Биохакерское мракобесие (депривация сна)", u: "https://t.me/masonsmansion/497", c: "💊 Здоровье" },
-            { t: "Грибной культ: мицелий вместо мозга", u: "https://t.me/masonsmansion/551", c: "💊 Здоровье" },
-            { t: "Ты спишь как лох (чудо-подушки)", u: "https://t.me/masonsmansion/561", c: "💊 Здоровье" },
-            { t: "Зимняя апатия: гайд по борьбе с хандрой", u: "https://t.me/masonsmansion/568", c: "💊 Здоровье" },
-            { t: "Боунсмешинг: смертельно опасный тренд", u: "https://t.me/masonsmansion/577", c: "💊 Здоровье" },
-            { t: "Подкаст #1: Дорогой, я хочу тебя", u: "https://t.me/masonsmansion/286", c: "🎙 Медиа" },
-            { t: "Подкаст #2: Как сдохнуть в 25 лет?", u: "https://t.me/masonsmansion/311", c: "🎙 Медиа" },
-            { t: "Подкаст #3: Стиль — это всё", u: "https://t.me/masonsmansion/403", c: "🎙 Медиа" },
-            { t: "Аудио-подкаст про соблазнение", u: "https://t.me/masonsmansion/247", c: "🎙 Медиа" },
-            { t: "Запись эфира про соблазнение (Видео)", u: "https://t.me/masonsmansion/300", c: "🎙 Медиа" },
-            { t: "Исповедь: Как я жил на улице (Видео)", u: "https://t.me/masonsmansion/485", c: "🎙 Медиа" },
-            { t: "Всеобщая тревога (Видеообращение)", u: "https://t.me/masonsmansion/506", c: "🎙 Медиа" },
-            { t: "Легендарная трансляция о манипуляциях", u: "https://t.me/masonsmansion/528", c: "🎙 Медиа" },
-            { t: "Биофорсаж: история успеха капеллана", u: "https://t.me/masonsmansion/532", c: "🎙 Медиа" },
-            { t: "Эфир про расставание (Видео)", u: "https://t.me/masonsmansion/519", c: "🎙 Медиа" },
-            { t: "Подкаст о Темной Триаде", u: "https://t.me/masonsmansion/564", c: "🎙 Медиа" },
-            { t: "Подкаст про женские проверки", u: "https://t.me/masonsmansion/434", c: "🎙 Медиа" },
-            { t: "Сказка о Степашке. Часть 1", u: "https://t.me/masonsmansion/174", c: "📜 Фольклор" },
-            { t: "Сказка о Степашке. Часть 2", u: "https://t.me/masonsmansion/194", c: "📜 Фольклор" },
-            { t: "Сказка о Степашке. Часть 3", u: "https://t.me/masonsmansion/203", c: "📜 Фольклор" },
-            { t: "Сказка о Степашке. Финал", u: "https://t.me/masonsmansion/210", c: "📜 Фольклор" },
-            { t: "Книга «Уроборос» (Киберпанк)", u: "https://t.me/masonsmansion/505", c: "📜 Фольклор" },
-            { t: "Гайд на сайты знакомств (Файл)", u: "https://t.me/masonsmansion/309", c: "🔒 Гайды/Отчеты" },
-            { t: "Отчет Инквизиции #1 (Весна 2025)", u: "https://t.me/masonsmansion/392", c: "🔒 Гайды/Отчеты" },
-            { t: "Отчет Инквизиции #2 (Март-Апрель 2025)", u: "https://t.me/masonsmansion/428", c: "🔒 Гайды/Отчеты" },
-            { t: "Отчет Инквизиции #3 (Май-Июнь 2025)", u: "https://t.me/masonsmansion/507", c: "🔒 Гайды/Отчеты" },
-            { t: "Куда пойти на свиданку (Гайд)", u: "https://t.me/masonsmansion/430", c: "🔒 Гайды/Отчеты" },
-            { t: "Зачем мы предлагаем тебе Инквизицию?", u: "https://t.me/masonsmansion/521", c: "🔒 Гайды/Отчеты" },
-            
-            // --- ПРИМЕРЫ ЗАКРЫТЫХ СТАТЕЙ (FOMO) ---
-            { t: "Самое подробное обьяснение тестостерона", u: "locked_1", c: "💊 Здоровье", locked: true },
-            { t: "Как пройти любую женскую проверку?", u: "locked_2", c: "💃 Женщины", locked: true },
-            { t: "Что с тобой сделала твоя инфантильность?", u: "locked_3", c: "⚔️ Жизнестойкость", locked: true }
-        ];
+        // КОНФИГ АЧИВОК
+        const ACHIEVEMENTS_CONFIG = {
+            "⚔️": { name: "СТОИК", icon: "⚔️", color: "#e74c3c", msg: "Ты познал дзен в хаосе. Сталь закалилась." },
+            "🧠": { name: "МЕНТАЛИСТ", icon: "🧠", color: "#3498db", msg: "Твой разум чист от багов. Матрица повержена." },
+            "💃": { name: "КАЗАНОВА", icon: "💃", color: "#e056fd", msg: "Ты знаешь о женщинах больше, чем они сами." },
+            "💊": { name: "МУТАНТ", icon: "💊", color: "#2ecc71", msg: "Твоя биохимия под контролем. Ты сверхчеловек." },
+            "🎙": { name: "ЭРУДИТ", icon: "🎙", color: "#f39c12", msg: "Ты впитал всю базу. Твой интеллект зашкаливает." },
+            "📜": { name: "ЛЕТОПИСЕЦ", icon: "📜", color: "#f1c40f", msg: "Ты хранитель древних знаний и легенд." }
+        };
+
+        let pendingAchievements = [];
 
         const categoriesMap = new Map();
-        db.forEach(item => {
-            if(item.locked) return; // Не считаем закрытые статьи в счетчике категорий
-            const parts = item.c.split(' ');
-            const icon = parts[0];
-            const name = parts.slice(1).join(' ');
-            if (!categoriesMap.has(item.c)) {
-                categoriesMap.set(item.c, { icon, name, full: item.c, count: 0 });
-            }
-            categoriesMap.get(item.c).count++;
-        });
+        if (typeof db !== 'undefined') {
+            db.forEach(item => {
+                if(item.locked) return;
+                const parts = item.c.split(' ');
+                const icon = parts[0];
+                const name = parts.slice(1).join(' ');
+                if (!categoriesMap.has(item.c)) {
+                    categoriesMap.set(item.c, { icon, name, full: item.c, count: 0 });
+                }
+                categoriesMap.get(item.c).count++;
+            });
+        }
+        
         const uniqueCategoriesList = Array.from(categoriesMap.values());
         
         let currentViewState = 'home';
         let currentCategory = null;
         let searchQuery = "";
 
-        // DOM Elements
         const listHeader = document.getElementById('listHeader');
         const backToHomeBtn = document.getElementById('backToHomeBtn');
         const homeTilesContainer = document.getElementById('homeTilesContainer');
@@ -411,8 +426,8 @@
         const favBtn = document.getElementById('favBtn');
         const favCount = document.getElementById('favCount');
         const randomBtn = document.getElementById('randomBtn');
+        const achievementsRow = document.getElementById('achievementsRow');
         
-        // Sheet Elements
         const modalOverlay = document.getElementById('modalOverlay');
         const postSheet = document.getElementById('postSheet');
         const sheetTitle = document.getElementById('sheetTitle');
@@ -424,20 +439,257 @@
         const lockedBtn = document.getElementById('lockedBtn');
         const relatedContainer = document.getElementById('relatedContainer');
         const upsellBtn = document.getElementById('upsellBtn');
+        
+        const celebrationModal = document.getElementById('celebrationModal');
+        const celIcon = document.getElementById('celIcon');
+        const celName = document.getElementById('celName');
+        const celMsg = document.getElementById('celMsg');
+        const celBtn = document.querySelector('.cel-btn');
+        const toast = document.getElementById('toast');
 
-        // --- DATA HELPERS ---
+        function showToast(msg) {
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function getNotified() { return JSON.parse(localStorage.getItem(NOTIFIED_KEY) || '[]'); }
+        function addNotified(id) { 
+            const list = getNotified();
+            if(!list.includes(id)) { list.push(id); localStorage.setItem(NOTIFIED_KEY, JSON.stringify(list)); }
+        }
+
+        function closeCelModal() {
+            celebrationModal.classList.remove('active');
+            if(pendingAchievements.length > 0) {
+                setTimeout(showNextAchievement, 500);
+            }
+        }
+
+        function showNextAchievement() {
+            if(pendingAchievements.length === 0) return;
+            const next = pendingAchievements.shift(); 
+            
+            celIcon.innerText = next.icon;
+            celName.innerText = next.name;
+            celMsg.innerText = next.msg || "Достижение разблокировано!";
+            
+            // Сброс стилей
+            celName.style.color = "#fff";
+            celName.style.textShadow = "none";
+            celIcon.style.filter = "none";
+            celBtn.style.background = "var(--accent-sunray)";
+            celBtn.style.color = "#000";
+            celBtn.style.boxShadow = "none";
+            document.querySelector('.celebration-card').style.borderColor = "var(--accent-sunray)";
+            document.querySelector('.celebration-card').style.boxShadow = "none";
+
+            if(next.color) {
+                celName.style.color = next.color;
+                celName.style.textShadow = `0 0 15px ${next.color}66`;
+                celIcon.style.filter = `drop-shadow(0 0 20px ${next.color})`;
+                celBtn.style.background = next.color;
+                celBtn.style.boxShadow = `0 5px 20px ${next.color}66`;
+                document.querySelector('.celebration-card').style.borderColor = next.color;
+                document.querySelector('.celebration-card').style.boxShadow = `0 0 50px ${next.color}33`;
+            } else if(next.name === "ВОЗНЕСЁННЫЙ") {
+                celName.style.color = "#00d4ff";
+                celName.style.textShadow = "0 0 20px rgba(0, 212, 255, 0.6)";
+                celIcon.style.filter = "drop-shadow(0 0 30px #00d4ff)";
+                celBtn.style.background = "linear-gradient(90deg, #E3BC57, #9D00FF, #00d4ff)";
+                celBtn.style.color = "#fff";
+                document.querySelector('.celebration-card').style.borderColor = "#00d4ff";
+            }
+
+            tg.HapticFeedback.impactOccurred('heavy');
+            celebrationModal.classList.add('active');
+            
+            addNotified(next.id);
+        }
+
+        function updateProgress() {
+            if (typeof db === 'undefined') return;
+            
+            const totalPosts = db.filter(item => !item.locked).length;
+            const readList = getRead();
+            const validReadCount = db.filter(item => !item.locked && readList.includes(item.u)).length;
+
+            let percent = 0;
+            if (totalPosts > 0) percent = Math.round((validReadCount / totalPosts) * 100);
+
+            let rank = "👁 НАБЛЮДАТЕЛЬ";
+            if (percent >= 10) rank = "🕯 НЕОФИТ";
+            if (percent >= 25) rank = "🗝 ПОСВЯЩЕННЫЙ";
+            if (percent >= 50) rank = "🔮 АДЕПТ";
+            if (percent >= 75) rank = "🧘 МАСТЕР";
+            if (percent >= 100) rank = "👑 ХРАНИТЕЛЬ";
+
+            const notified = getNotified();
+            
+            uniqueCategoriesList.forEach(cat => {
+                const config = ACHIEVEMENTS_CONFIG[cat.icon];
+                if(!config) return;
+                
+                const catPosts = db.filter(p => p.c === cat.full && !p.locked);
+                const catRead = catPosts.filter(p => readList.includes(p.u)).length;
+                
+                if (catPosts.length > 0 && catRead === catPosts.length) {
+                    if(!notified.includes(cat.full)) {
+                        if(!pendingAchievements.find(p => p.id === cat.full)) {
+                            pendingAchievements.push({
+                                id: cat.full,
+                                name: config.name,
+                                icon: config.icon,
+                                color: config.color,
+                                msg: config.msg
+                            });
+                        }
+                    }
+                }
+            });
+
+            let totalAchievementsCount = uniqueCategoriesList.length;
+            let unlockedAchievementsCount = 0;
+            uniqueCategoriesList.forEach(cat => {
+                const catPosts = db.filter(p => p.c === cat.full && !p.locked);
+                const catRead = catPosts.filter(p => readList.includes(p.u)).length;
+                if (catPosts.length > 0 && catRead === catPosts.length) unlockedAchievementsCount++;
+            });
+
+            if (unlockedAchievementsCount > 0 && unlockedAchievementsCount === totalAchievementsCount) {
+                rank = "🌌 ВОЗНЕСЁННЫЙ";
+                if(!notified.includes("ASCENDED")) {
+                    if(!pendingAchievements.find(p => p.id === "ASCENDED")) {
+                        pendingAchievements.push({
+                            id: "ASCENDED",
+                            name: "ВОЗНЕСЁННЫЙ",
+                            icon: "🌌",
+                            msg: "Ты прошел путь. Ты видел всё. Теперь ты создаешь реальность."
+                        });
+                    }
+                }
+            }
+
+            const progressBar = document.getElementById('progressBar');
+            const rankName = document.getElementById('rankName');
+            const progressStats = document.getElementById('progressStats');
+            const progressCard = document.getElementById('progressCard');
+
+            if (progressBar && rankName) {
+                progressBar.style.width = percent + '%';
+                rankName.innerText = rank;
+                progressStats.innerText = `${validReadCount}/${totalPosts} (${percent}%)`;
+
+                rankName.className = 'rank-name';
+                progressCard.className = 'progress-card glide-entry';
+
+                if (rank === "🌌 ВОЗНЕСЁННЫЙ") {
+                    rankName.classList.add('ascended-text');
+                    progressCard.classList.add('ascended');
+                } else {
+                    if (percent >= 50) rankName.classList.add('gold');
+                    if (percent === 100) progressCard.classList.add('completed');
+                }
+            }
+
+            renderAchievements(readList);
+        }
+
+        function renderAchievements(readList) {
+            achievementsRow.innerHTML = '';
+            
+            uniqueCategoriesList.forEach(cat => {
+                const config = ACHIEVEMENTS_CONFIG[cat.icon];
+                if(!config) return;
+
+                const catPosts = db.filter(p => p.c === cat.full && !p.locked);
+                const catTotal = catPosts.length;
+                if(catTotal === 0) return;
+
+                const catRead = catPosts.filter(p => readList.includes(p.u)).length;
+                const isUnlocked = catRead === catTotal;
+
+                const badge = document.createElement('div');
+                badge.className = `badge ${isUnlocked ? 'unlocked' : ''}`;
+                badge.innerText = config.icon;
+                
+                // ВАЖНОЕ ИСПРАВЛЕНИЕ: ТОСТ ДЛЯ ЗАКРЫТЫХ, МОДАЛКА ДЛЯ ОТКРЫТЫХ
+                if(isUnlocked) {
+                    badge.style.borderColor = config.color;
+                    badge.style.color = "#fff";
+                    badge.style.boxShadow = `0 0 8px ${config.color}66`;
+                    badge.style.background = `${config.color}22`;
+                } else {
+                    badge.style.borderColor = "#444";
+                    badge.style.color = "#666";
+                    badge.style.boxShadow = "none";
+                    badge.style.background = "#252525";
+                }
+                
+                badge.onclick = () => {
+                    tg.HapticFeedback.impactOccurred('light');
+                    if(isUnlocked) {
+                        // Показываем крутую модалку
+                        celIcon.innerText = config.icon;
+                        celName.innerText = config.name;
+                        celMsg.innerText = config.msg;
+                        
+                        celName.style.color = config.color;
+                        celName.style.textShadow = `0 0 15px ${config.color}66`;
+                        celIcon.style.filter = `drop-shadow(0 0 20px ${config.color})`;
+                        celBtn.style.background = config.color;
+                        celBtn.style.boxShadow = `0 5px 20px ${config.color}66`;
+                        document.querySelector('.celebration-card').style.borderColor = config.color;
+                        
+                        celebrationModal.classList.add('active');
+                    } else {
+                        // Показываем маленький тост-подсказку
+                        showToast(`Прочитай раздел ${cat.icon}, чтобы открыть`);
+                    }
+                };
+
+                achievementsRow.appendChild(badge);
+            });
+            
+            const isAscended = getNotified().includes("ASCENDED");
+            const ascendedBadge = document.createElement('div');
+            ascendedBadge.className = `badge secret ${isAscended ? 'unlocked' : ''}`;
+            ascendedBadge.innerText = isAscended ? "🌌" : "?";
+            ascendedBadge.onclick = () => {
+                if(isAscended) {
+                    // Модалка вознесенного
+                    celIcon.innerText = "🌌";
+                    celName.innerText = "ВОЗНЕСЁННЫЙ";
+                    celMsg.innerText = "Ты прошел путь. Ты видел всё.";
+                    celName.style.color = "#00d4ff";
+                    celIcon.style.filter = "drop-shadow(0 0 30px #00d4ff)";
+                    celBtn.style.background = "linear-gradient(90deg, #E3BC57, #9D00FF, #00d4ff)";
+                    document.querySelector('.celebration-card').style.borderColor = "#00d4ff";
+                    celebrationModal.classList.add('active');
+                } else {
+                    showToast("Секретное достижение. Собери их все.");
+                }
+            };
+            achievementsRow.appendChild(ascendedBadge);
+        }
+
         function getRead() { return JSON.parse(localStorage.getItem(READ_KEY) || '[]'); }
         function setRead(url) { 
             const list = getRead();
-            if(!list.includes(url)) { list.push(url); localStorage.setItem(READ_KEY, JSON.stringify(list)); }
+            if(!list.includes(url)) { 
+                list.push(url); 
+                localStorage.setItem(READ_KEY, JSON.stringify(list)); 
+                updateProgress(); 
+            }
         }
+        
         function getFav() { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); }
         function toggleFav(url) {
             let list = getFav();
             if(list.includes(url)) list = list.filter(u => u !== url);
             else list.push(url);
             localStorage.setItem(FAV_KEY, JSON.stringify(list));
-            updateFavCard(); // Обновить плитку на главной
+            updateFavCard();
             return list.includes(url);
         }
 
@@ -454,16 +706,9 @@
             });
         }
 
-        // --- STATE MANAGEMENT ---
         function saveState() {
             try {
-                const state = {
-                    view: currentViewState,
-                    category: currentCategory,
-                    scroll: window.scrollY,
-                    search: searchQuery,
-                    ts: Date.now()
-                };
+                const state = { view: currentViewState, category: currentCategory, scroll: window.scrollY, search: searchQuery, ts: Date.now() };
                 localStorage.setItem(STATE_KEY, JSON.stringify(state));
             } catch (e) {}
         }
@@ -499,12 +744,18 @@
             tagsContainer.style.display = 'none';
             listViewContainer.style.display = 'none';
             homeWrapper.style.display = 'block';
-            randomBtn.style.display = 'flex'; // Показываем рандом
+            randomBtn.style.display = 'flex';
             adjustPadding();
             window.scrollTo({ top: 0 });
             tg.HapticFeedback.impactOccurred('light');
             localStorage.removeItem(STATE_KEY);
             updateFavCard();
+            updateProgress(); // Обновляем прогресс при входе на главную
+            
+            // ПРОВЕРКА ОЧЕРЕДИ НАГРАД
+            if(pendingAchievements.length > 0) {
+                showNextAchievement();
+            }
         }
 
         function switchToList(category, animate = true) {
@@ -514,14 +765,13 @@
             tagsContainer.style.display = 'flex';
             homeWrapper.style.display = 'none';
             listViewContainer.style.display = 'block';
-            randomBtn.style.display = 'none'; // Скрываем рандом в списке
+            randomBtn.style.display = 'none';
             renderTags();
             filterAndRenderList(animate);
             adjustPadding();
             if(animate) window.scrollTo({ top: 0 });
         }
 
-        // --- SPECIFIC LISTS ---
         function showCredo(animate = true) {
             setupSpecialList("🏛 ФУНДАМЕНТ & КРЕДО", animate);
         }
@@ -537,14 +787,12 @@
             homeWrapper.style.display = 'none';
             listViewContainer.style.display = 'block';
             randomBtn.style.display = 'none';
-            
             tagsContainer.innerHTML = '';
             const homeTag = document.createElement('div');
             homeTag.className = 'tag';
             homeTag.innerText = '← На Главную';
             homeTag.onclick = switchToHome;
             tagsContainer.appendChild(homeTag);
-            
             filterAndRenderList(animate);
             adjustPadding();
             if(animate) window.scrollTo({ top: 0 });
@@ -604,7 +852,6 @@
             let animationIndex = 0;
             let filtered = [];
 
-            // FILTERING LOGIC
             if (currentCategory === "🏛 ФУНДАМЕНТ & КРЕДО") {
                 const credoUrls = ["https://t.me/masonsmansion/61", "https://t.me/masonsmansion/12", "https://t.me/masonsmansion/34", "https://t.me/masonsmansion/286"];
                 filtered = db.filter(item => credoUrls.includes(item.u));
@@ -619,7 +866,6 @@
                 });
             }
 
-            // SMART STUB
             if (filtered.length === 0) {
                 const msg = currentCategory === "⭐️ ИЗБРАННОЕ" ? "В избранном пока пусто." : `По запросу "<b>${searchQuery}</b>" ничего нет.`;
                 postsContainer.innerHTML = `
@@ -646,7 +892,6 @@
                 const div = document.createElement('div');
                 const isRead = readList.includes(item.u);
                 
-                // CLASSES
                 let classes = animate ? 'post-card glide-entry' : 'post-card';
                 if(item.locked) classes += ' post-locked';
                 if(isRead && !item.locked) classes += ' is-read';
@@ -654,14 +899,12 @@
                 div.className = classes;
                 if (animate) div.style.animationDelay = `${0.05 + (animationIndex * 0.03)}s`;
                 
-                // TITLE HTML
                 let titleHtml = item.t;
                 if (searchQuery) {
                     const regex = new RegExp(`(${searchQuery})`, 'gi');
                     titleHtml = item.t.replace(regex, '<span class="highlight">$1</span>');
                 }
                 
-                // ICONS
                 let iconsHtml = '';
                 if(item.locked) iconsHtml += '<span class="lock-icon">🔒</span>';
                 else if(isRead) iconsHtml += '<span class="read-icon">✓</span>';
@@ -673,30 +916,25 @@
             });
         }
 
-        // GLOBAL SEARCH
         searchInput.addEventListener('input', (e) => {
             searchQuery = e.target.value;
             if (currentViewState === 'home' && searchQuery.length > 0) switchToList(null, true);
             filterAndRenderList(true);
         });
 
-        // --- RANDOMIZER ---
         randomBtn.onclick = () => {
             tg.HapticFeedback.impactOccurred('heavy');
-            // Только бесплатные посты
             const freePosts = db.filter(item => !item.locked);
             const randomItem = freePosts[Math.floor(Math.random() * freePosts.length)];
             openSheet(randomItem);
         }
 
-        // --- SHEET LOGIC ---
         function openSheet(item) {
             tg.HapticFeedback.impactOccurred('medium');
             sheetTitle.innerText = item.t;
             const catIcon = item.c.split(' ')[0];
             sheetCategory.innerHTML = `<span style="font-size: 18px;">${catIcon}</span> ${item.c.substring(catIcon.length)}`;
             
-            // LOCKED vs FREE Logic
             if(item.locked) {
                 sheetActions.style.display = 'none';
                 lockedBtn.style.display = 'block';
@@ -705,31 +943,26 @@
                 sheetActions.style.display = 'flex';
                 lockedBtn.style.display = 'none';
                 
-                // Mark as Read
                 setRead(item.u);
                 
-                // Setup Read Button
                 readBtn.onclick = () => {
                     tg.HapticFeedback.impactOccurred('light');
                     saveState();
                     tg.openTelegramLink(item.u);
                 };
 
-                // Setup Share Button
                 shareBtn.onclick = () => {
                     tg.HapticFeedback.impactOccurred('light');
                     const shareUrl = 'https://t.me/share/url?url=' + encodeURIComponent(item.u) + '&text=' + encodeURIComponent(item.t);
                     tg.openTelegramLink(shareUrl);
                 };
 
-                // Setup Fav Button
                 const isFav = getFav().includes(item.u);
                 updateFavBtnStyle(isFav);
                 favSheetBtn.onclick = () => {
                     tg.HapticFeedback.impactOccurred('light');
                     const newState = toggleFav(item.u);
                     updateFavBtnStyle(newState);
-                    // Если мы в списке избранного - обновляем его сразу
                     if(currentCategory === "⭐️ ИЗБРАННОЕ") filterAndRenderList(false);
                 };
             }
@@ -755,7 +988,6 @@
             modalOverlay.classList.add('active');
             postSheet.classList.add('active');
             
-            // Если пост был не прочитан, обновим список на фоне, чтобы появилась галочка
             if(!item.locked && !document.querySelector(`.post-card[onclick*="${item.u}"]`)?.classList.contains('is-read')) {
                  filterAndRenderList(false);
             }
@@ -764,10 +996,10 @@
         function updateFavBtnStyle(isActive) {
             if(isActive) {
                 favSheetBtn.classList.add('active');
-                favSheetBtn.innerText = '⭐️'; // Filled star
+                favSheetBtn.innerText = '⭐️';
             } else {
                 favSheetBtn.classList.remove('active');
-                favSheetBtn.innerText = '☆'; // Empty star
+                favSheetBtn.innerText = '☆';
             }
         }
 
@@ -790,9 +1022,11 @@
             showFavorites(true);
         });
 
-        // INIT
-        updateFavCard();
-        renderHomeTiles();
+        if (typeof db !== 'undefined') {
+            updateFavCard();
+            renderHomeTiles();
+            updateProgress();
+        }
         adjustPadding();
         restoreState();
         window.addEventListener('resize', adjustPadding);
